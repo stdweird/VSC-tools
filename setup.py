@@ -68,9 +68,10 @@ import distutils.command.install_scripts
 import shutil
 import os
 
-## generate these somehow from MPI
-fake_path_name = 'fake'
-all_mympirun_alias = ['%smpirun' % x for x in ['i', 'ih', 'o', 'm', 'mh', 'mm', 'q', 'm2', 'm2h']]
+## generate these somehow from lib/vsc/mympirun/mpi/mpi.py
+FAKE_SUBDIRECTORY_NAME = 'fake'
+MYMPIRUN_ALIASES = ['%smpirun' % x for x in ['i', 'ih', 'o', 'm', 'mh', 'mm', 'q', 'm2', 'm2h']]
+
 class vsc_install_scripts(distutils.command.install_scripts.install_scripts):
     """Create the (fake) links for mympirun
         also remove .sh and .py extensions from the scripts
@@ -93,7 +94,7 @@ class vsc_install_scripts(distutils.command.install_scripts.install_scripts):
 
             if script.endswith('/mympirun'):
                 ## make the fake dir, create all symlinks
-                abs_fakepath = os.path.join(self.install_dir, fake_path_name)
+                abs_fakepath = os.path.join(self.install_dir, FAKE_SUBDIRECTORY_NAME)
                 if not os.path.isdir(abs_fakepath):
                     os.mkdir(abs_fakepath)
                 ## make all links
@@ -102,13 +103,13 @@ class vsc_install_scripts(distutils.command.install_scripts.install_scripts):
                 rel_script = os.path.basename(script)
                 rel_script_dir = os.path.dirname(script)
 
-                ## abspath: all_syms = [os.path.join(self.install_dir, x) for x in all_mympirun_alias]
+                ## abspath: all_syms = [os.path.join(self.install_dir, x) for x in MYMPIRUN_ALIASES]
                 ## abspath: all_syms.append(os.path.join(abs_fakepath, 'mpirun'))
                 ## with relative paths, we also ne to chdir for the fake/mpirun and ref to ../mympirun
                 previous_pwd = os.getcwd()
                 os.chdir(rel_script_dir)
 
-                for sym_name in all_mympirun_alias:
+                for sym_name in MYMPIRUN_ALIASES:
                     if os.path.exists(sym_name):
                         os.remove(sym_name)
                     os.symlink(rel_script, sym_name)
