@@ -64,8 +64,13 @@ TODO:
     create http://hpcugent.github.com/VSC-tools page, short description per package ?
 
 """
+from distutils import log  # also for setuptools
+import shutil
+import os
+import sys
+
 try:
-    ## setuptools makes copies of the scripts, does nto preserve symlinks
+    ## setuptools makes copies of the scripts, does not preserve symlinks
     from setuptools import setup
     from setuptools.command.install_scripts import install_scripts
     from setuptools.command.easy_install import easy_install
@@ -74,20 +79,18 @@ except:
     from distutils.command.install_scripts import install_scripts
     easy_install = object
 
-from distutils import log  # also for setuptools
-import shutil
-import os
 
 ## generate these somehow from lib/vsc/mympirun/mpi/mpi.py
 FAKE_SUBDIRECTORY_NAME = 'fake'
-MYMPIRUN_ALIASES = ['%smpirun' % x for x in ['i', 'ih', 'o', 'm', 'mh', 'mm', 'q', 'm2', 'm2h']]
+MYMPIRUN_ALIASES = ['%smpirun' % x for x in ['i', 'ih', 'o', 'm', 'mh', 'mm', 'q', 'm2', 'm2h']] + ['myscoop']
 
 class vsc_easy_install(easy_install):
     def install_egg_scripts(self, dist):
         orig_func = dist.metadata_listdir
         def new_func(txt):
-            """The original metadat_listdir assumes no subdirectories in scripts dir.
+            """The original metadata_listdir assumes no subdirectories in scripts dir.
                 fake/mpirun is the exception (mpirun itself is not listed !)
+                    The function is used through a whole bunch of Egg classes, now way we can easily intercept this
             """
             res = orig_func(txt)
             if txt == 'scripts':
@@ -209,7 +212,6 @@ VSC_MYMPIRUN = {'name':'vsc-mympirun',
 ###
 ### BUILDING
 ###
-import sys
 
 def parse_target(target):
     """Add some fields"""
@@ -226,56 +228,57 @@ def parse_target(target):
             new_target[k] = v
     return new_target
 
+def main():
+    all_targets = [VSC_BASE, VSC_MYMPIRUN, VSC_ALLINONE]
+    registered_names = ['vsc-all', 'vsc-allinone'] + [x['name'] for x in all_targets]
 
+    envname = 'VSC_TOOLS_SETUP_TARGET'
+    tobuild = os.environ.get(envname, 'vsc-all')  ## default all
+    if sys.argv[1] == 'vsc-showall':
+        print "Valid targets: %s" % " ".join(registered_names)
+        sys.exit(0)
+    elif sys.argv[1] in registered_names:
+        tobuild = sys.argv[1]
+        sys.argv.pop(1)
 
-all_targets = [VSC_BASE, VSC_MYMPIRUN, VSC_ALLINONE]
-registered_names = ['vsc-all', 'vsc-allinone'] + [x['name'] for x in all_targets]
-
-envname = 'VSC_TOOLS_SETUP_TARGET'
-tobuild = os.environ.get(envname, 'vsc-all')  ## default all
-if sys.argv[1] == 'vsc-showall':
-    print "Valid targets: %s" % " ".join(registered_names)
-    sys.exit(0)
-elif sys.argv[1] in registered_names:
-    tobuild = sys.argv[1]
-    sys.argv.pop(1)
-
-## create allinone / vsc-tools target
-for target in all_targets:
-    for k, v in target.items():
-        if k in ('name', 'version',):
-            continue
-        if not k in VSC_ALLINONE:
-            VSC_ALLINONE[k] = v
-        else:
-            if isinstance(v, list):
-                VSC_ALLINONE[k] += v
+    ## create allinone / vsc-tools target
+    for target in all_targets:
+        for k, v in target.items():
+            if k in ('name', 'version',):
+                continue
+            if not k in VSC_ALLINONE:
+                VSC_ALLINONE[k] = v
             else:
-                print 'ERROR: unsupported type cfgname %s key %s value %s' % (target['name'], k, v)
-                sys.exit(1)
-## sanitize allinone/vsc-tools
-for k, v in VSC_ALLINONE.items():
-    if isinstance(v, list):
-        VSC_ALLINONE[k] = list(set(VSC_ALLINONE[k]))
-        VSC_ALLINONE[k].sort()
+                if isinstance(v, list):
+                    VSC_ALLINONE[k] += v
+                else:
+                    print 'ERROR: unsupported type cfgname %s key %s value %s' % (target['name'], k, v)
+                    sys.exit(1)
+    ## sanitize allinone/vsc-tools
+    for k, v in VSC_ALLINONE.items():
+        if isinstance(v, list):
+            VSC_ALLINONE[k] = list(set(VSC_ALLINONE[k]))
+            VSC_ALLINONE[k].sort()
 
 
-if tobuild == 'vsc-allinone':
-    ## reset all_targets
-    all_targets = [VSC_ALLINONE]
+    if tobuild == 'vsc-allinone':
+        ## reset all_targets
+        all_targets = [VSC_ALLINONE]
 
-## build what ?
-for target in all_targets:
-    target_name = target['name']
-    if (tobuild is not None) and not (tobuild in ('vsc-all', 'vsc-allinone' , target_name,)):
-        continue
-    if tobuild == 'vsc-all' and target_name == 'vsc-tools':
-        ## vsc-tools / allinone is not a default when vsc-all is selected
-        continue
+    ## build what ?
+    for target in all_targets:
+        target_name = target['name']
+        if (tobuild is not None) and not (tobuild in ('vsc-all', 'vsc-allinone' , target_name,)):
+            continue
+        if tobuild == 'vsc-all' and target_name == 'vsc-tools':
+            ## vsc-tools / allinone is not a default when vsc-all is selected
+            continue
 
-    ## froim now on, build the exact targets.
-    os.environ[envname] = target_name
-    os.putenv(envname, target_name)
+        ## froim now on, build the exact targets.
+        os.environ[envname] = target_name
+        os.putenv(envname, target_name)
 
-    x = parse_target(target)
-    setup(**x)
+        x = parse_target(target)
+        setup(**x)
+
+main()
