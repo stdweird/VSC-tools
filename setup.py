@@ -71,6 +71,7 @@ import sys
 
 try:
     ## setuptools makes copies of the scripts, does not preserve symlinks
+    raise("a")
     from setuptools import setup
     from setuptools.command.install_scripts import install_scripts
     from setuptools.command.easy_install import easy_install
@@ -79,6 +80,8 @@ except:
     from distutils.command.install_scripts import install_scripts
     easy_install = object
 
+## 0 : WARN (default), 1 : INFO, 2 : DEBUG
+log.set_verbosity(1)
 
 ## generate these somehow from lib/vsc/mympirun/mpi/mpi.py
 FAKE_SUBDIRECTORY_NAME = 'fake'
@@ -194,9 +197,8 @@ VSC_BASE = {'name' : 'vsc-base',
             'version':"0.9.0" ,
             'author':[sdw, jt],
             'maintainer':[sdw, jt],
-            'packages':['vsc/utils'],
-            'py_modules':['vsc/__init__', 'vsc/dateandtime', 'vsc/fancylogger', 'vsc/generaloption'],
-            'scripts':['bin/logdaemon.py']
+            'packages':['vsc', 'vsc/utils'],
+            'scripts':['bin/logdaemon.py', 'bin/startlogdaemon.sh']
             }
 
 
@@ -234,6 +236,7 @@ def main():
 
     envname = 'VSC_TOOLS_SETUP_TARGET'
     tobuild = os.environ.get(envname, 'vsc-all')  ## default all
+    log.info('main: going to build %s (set through env: %s)' % (tobuild, envname in os.environ))
     if sys.argv[1] == 'vsc-showall':
         print "Valid targets: %s" % " ".join(registered_names)
         sys.exit(0)
@@ -278,6 +281,7 @@ def main():
         os.environ[envname] = target_name
         os.putenv(envname, target_name)
 
+        log.info("main: setup target_name %s target %s" % (target_name, target))
         x = parse_target(target)
         setup(**x)
 
