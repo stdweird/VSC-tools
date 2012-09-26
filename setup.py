@@ -71,7 +71,7 @@ import sys
 
 try:
     ## setuptools makes copies of the scripts, does not preserve symlinks
-    raise("a")
+    #raise("a")  # to try distutils, uncomment
     from setuptools import setup
     from setuptools.command.install_scripts import install_scripts
     from setuptools.command.easy_install import easy_install
