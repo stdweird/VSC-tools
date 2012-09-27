@@ -63,11 +63,18 @@ make rpm for all targets at once (works for single target)
 TODO:
     create http://hpcugent.github.com/VSC-tools page, short description per package ?
 
+Tip from docs:
+    On the other hand, this doesn't help the developer to find the cause of the failure.
+    For this purpose, the DISTUTILS_DEBUG environment variable can be set to anything except
+    an empty string, and distutils will now print detailed information what it is doing, and
+    prints the full traceback in case an exception occurs.
+
 """
-from distutils import log  # also for setuptools
 import shutil
 import os
 import sys
+from distutils import log  # also for setuptools
+from distutils.dir_util import remove_tree
 
 try:
     ## setuptools makes copies of the scripts, does not preserve symlinks
@@ -184,7 +191,8 @@ SHARED_TARGET = {'url':'http://hpcugent.github.com/VSC-tools',
                  'download_url':'https://github.com/hpcugent/VSC-tools',
                  'package_dir' : {'': 'lib'},
                  'cmdclass' : {"install_scripts": vsc_install_scripts,
-                               "easy_install":vsc_easy_install}
+                               "easy_install":vsc_easy_install},
+                 'namespace_packages': ['vsc'],
                  }
 
 ## meta-package for allinone target
@@ -197,19 +205,28 @@ VSC_BASE = {'name' : 'vsc-base',
             'version':"0.9.0" ,
             'author':[sdw, jt],
             'maintainer':[sdw, jt],
-            'packages':['vsc', 'vsc/utils'],
+            'packages':['vsc', 'vsc.utils'],
             'scripts':['bin/logdaemon.py', 'bin/startlogdaemon.sh']
             }
-
-
 
 VSC_MYMPIRUN = {'name':'vsc-mympirun',
                 'version':'3.0.0',
                 'author':[sdw],
                 'maintainer':[sdw],
-                'packages':['vsc/mympirun', 'vsc/mympirun/mpi', 'vsc/mympirun/rm'],
+                'install_requires':['vsc-base>=0.9.0'],
+                'packages':['vsc.mympirun', 'vsc.mympirun.mpi', 'vsc.mympirun.rm'],
                 'scripts':['bin/mympirun.py', 'bin/pbsssh.sh', 'bin/sshsleep.sh'],
                 }
+
+VSC_MYMPIRUN_SCOOP = {'name':'vsc-mympirun-scoop',
+                      'version':'3.0.0',
+                      'author':[sdw],
+                      'maintainer':[sdw],
+                      'install_requires':['vsc-mympirun>=3.0.0', 'scoop>=0.5.4'],
+                      'packages':['vsc.mympirun.scoop'],
+                      #'scripts':['bin/mympirun.py'], is installed with vsc-mympirun
+                      }
+
 
 ###
 ### BUILDING
@@ -231,7 +248,7 @@ def parse_target(target):
     return new_target
 
 def main():
-    all_targets = [VSC_BASE, VSC_MYMPIRUN, VSC_ALLINONE]
+    all_targets = [VSC_BASE, VSC_MYMPIRUN, VSC_MYMPIRUN_SCOOP, VSC_ALLINONE]
     registered_names = ['vsc-all', 'vsc-allinone'] + [x['name'] for x in all_targets]
 
     envname = 'VSC_TOOLS_SETUP_TARGET'
@@ -268,6 +285,13 @@ def main():
         ## reset all_targets
         all_targets = [VSC_ALLINONE]
 
+    def cleanup():
+        try:
+            remove_tree('build')
+        except OSError, _:
+            pass
+
+
     ## build what ?
     for target in all_targets:
         target_name = target['name']
@@ -283,6 +307,9 @@ def main():
 
         log.info("main: setup target_name %s target %s" % (target_name, target))
         x = parse_target(target)
+
+        cleanup()
         setup(**x)
+        cleanup()
 
 main()
