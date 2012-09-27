@@ -104,9 +104,10 @@ class vsc_easy_install(easy_install):
             """
             res = orig_func(txt)
             if txt == 'scripts':
-                idx = res.index(FAKE_SUBDIRECTORY_NAME)
-                if idx >= 0:
-                    res[idx] = '%s/mpirun' % FAKE_SUBDIRECTORY_NAME
+                if FAKE_SUBDIRECTORY_NAME in res:
+                    idx = res.index(FAKE_SUBDIRECTORY_NAME)
+                    if idx >= 0:
+                        res[idx] = '%s/mpirun' % FAKE_SUBDIRECTORY_NAME
             return res
         dist.metadata_listdir = new_func
         easy_install.install_egg_scripts(self, dist)
@@ -215,6 +216,7 @@ VSC_MYMPIRUN = {'name':'vsc-mympirun',
                 'maintainer':[sdw],
                 'install_requires':['vsc-base>=0.9.0'],
                 'packages':['vsc.mympirun', 'vsc.mympirun.mpi', 'vsc.mympirun.rm'],
+                'py_modules': ['vsc.__init__'],
                 'scripts':['bin/mympirun.py', 'bin/pbsssh.sh', 'bin/sshsleep.sh'],
                 }
 
@@ -224,6 +226,7 @@ VSC_MYMPIRUN_SCOOP = {'name':'vsc-mympirun-scoop',
                       'maintainer':[sdw],
                       'install_requires':['vsc-mympirun>=3.0.0', 'scoop>=0.5.4'],
                       'packages':['vsc.mympirun.scoop'],
+                      'py_modules': ['vsc.__init__', 'vsc.mympirun.__init__'],
                       #'scripts':['bin/mympirun.py'], is installed with vsc-mympirun
                       }
 
@@ -239,12 +242,14 @@ def parse_target(target):
     for k, v in target.items():
         if k in ('author', 'maintainer'):
             if not isinstance(v, list):
-                print "ERROR: %s of config %s needs to be a list (not tuple or string)" % (k, target['name'])
+                log.error("%s of config %s needs to be a list (not tuple or string)" % (k, target['name']))
                 sys.exit(1)
             new_target[k] = ";".join([x[0] for x in v])
             new_target["%s_email" % k] = ";".join([x[1] for x in v])
         else:
-            new_target[k] = v
+            new_target[k] = type(v)()
+            new_target[k] += v
+    log.info("parse_target: new_target %s" % new_target)
     return new_target
 
 def main():
@@ -263,17 +268,19 @@ def main():
 
     ## create allinone / vsc-tools target
     for target in all_targets:
+        log.info("allinone target %s %s" % (target['name'], target))
         for k, v in target.items():
             if k in ('name', 'version',):
                 continue
             if not k in VSC_ALLINONE:
-                VSC_ALLINONE[k] = v
+                VSC_ALLINONE[k] = type(v)()
+
+            if isinstance(v, (list, str)):
+                VSC_ALLINONE[k] += v
             else:
-                if isinstance(v, list):
-                    VSC_ALLINONE[k] += v
-                else:
-                    print 'ERROR: unsupported type cfgname %s key %s value %s' % (target['name'], k, v)
-                    sys.exit(1)
+                print 'ERROR: unsupported type cfgname %s key %s value %s' % (target['name'], k, v)
+                sys.exit(1)
+
     ## sanitize allinone/vsc-tools
     for k, v in VSC_ALLINONE.items():
         if isinstance(v, list):
@@ -293,6 +300,7 @@ def main():
 
 
     ## build what ?
+    log.info("starting to build...")
     for target in all_targets:
         target_name = target['name']
         if (tobuild is not None) and not (tobuild in ('vsc-all', 'vsc-allinone' , target_name,)):
