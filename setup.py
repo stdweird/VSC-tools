@@ -97,6 +97,7 @@ MYMPIRUN_ALIASES = ['%smpirun' % x for x in ['i', 'ih', 'o', 'm', 'mh', 'mm', 'q
 class vsc_easy_install(easy_install):
     log.info('using vsc_easy_install')
     def install_egg_scripts(self, dist):
+        log.info('using vsc_easy_install install_egg_scripts')
         orig_func = dist.metadata_listdir
         def new_func(txt):
             """The original metadata_listdir assumes no subdirectories in scripts dir.
