@@ -60,6 +60,15 @@ build under /tmp/vsc, install with prefix /tmp/vsc/testinstall
 make rpm for all targets at once (works for single target)
     python setup.py clean sdist -d /tmp/vsc$USER bdist_rpm --bdist-base /tmp/vsc$USER -d /tmp/vsc$USER clean ; rm -f MANIFEST
 
+easy_install
+------------
+## 1st run: without dependencies
+easy_install --user -N http://github.com/hpcugent/VSC-tools/tarball/master
+
+## 2nd run with dependencies to resolve external ones
+easy_install --user http://github.com/hpcugent/VSC-tools/tarball/master
+
+
 TODO:
     create http://hpcugent.github.com/VSC-tools page, short description per package ?
 
@@ -71,7 +80,7 @@ Tip from docs:
 
 """
 import shutil
-import os
+import os, os.path
 import sys
 from distutils import log  # also for setuptools
 from distutils.dir_util import remove_tree
@@ -79,6 +88,7 @@ from distutils.dir_util import remove_tree
 ## generate these somehow from lib/vsc/mympirun/mpi/mpi.py
 FAKE_SUBDIRECTORY_NAME = 'fake'
 MYMPIRUN_ALIASES = ['%smpirun' % x for x in ['i', 'ih', 'o', 'm', 'mh', 'mm', 'q', 'm2', 'm2h']] + ['myscoop']
+ENVNAME = 'VSC_TOOLS_SETUP_TARGET'
 
 ## 0 : WARN (default), 1 : INFO, 2 : DEBUG
 log.set_verbosity(1)
@@ -95,7 +105,6 @@ try:
     _orig_install_egg_scripts = sys.modules['setuptools.command.easy_install'].easy_install.install_egg_scripts
 
     def _new_install_egg_scripts(self, dist):
-        log.info('using vsc_easy_install install_egg_scripts')
         orig_func = dist.metadata_listdir
         def new_func(txt):
             """The original metadata_listdir assumes no subdirectories in scripts dir.
@@ -123,7 +132,6 @@ class vsc_install_scripts(install_scripts):
     """Create the (fake) links for mympirun
         also remove .sh and .py extensions from the scripts
     """
-    log.info('using vsc_install_scripts')
     def __init__(self, *args):
         install_scripts.__init__(self, *args)
         self.original_outfiles = None
@@ -260,13 +268,15 @@ def parse_target(target):
     log.info("parse_target: new_target %s" % new_target)
     return new_target
 
-def main():
+
+
+def make_all_targets():
     all_targets = [VSC_BASE, VSC_MYMPIRUN, VSC_MYMPIRUN_SCOOP, VSC_ALLINONE]
+    #all_targets = [VSC_BASE, VSC_ALLINONE]
     registered_names = ['vsc-all', 'vsc-allinone'] + [x['name'] for x in all_targets]
 
-    envname = 'VSC_TOOLS_SETUP_TARGET'
-    tobuild = os.environ.get(envname, 'vsc-all')  ## default all
-    log.debug('main: going to build %s (set through env: %s)' % (tobuild, envname in os.environ))
+    tobuild = os.environ.get(ENVNAME, 'vsc-all')  ## default all
+    log.debug('main: going to build %s (set through env: %s)' % (tobuild, ENVNAME in os.environ))
     if sys.argv[1] == 'vsc-showall':
         log.error("Valid targets: %s" % " ".join(registered_names))
         sys.exit(0)
@@ -276,7 +286,6 @@ def main():
 
     ## create allinone / vsc-tools target
     for target in all_targets:
-        log.info("allinone target %s %s" % (target['name'], target))
         for k, v in target.items():
             if k in ('name', 'version',):
                 continue
@@ -295,38 +304,45 @@ def main():
             VSC_ALLINONE[k] = list(set(VSC_ALLINONE[k]))
             VSC_ALLINONE[k].sort()
 
-
     if tobuild == 'vsc-allinone':
         ## reset all_targets
         all_targets = [VSC_ALLINONE]
 
-    def cleanup():
-        try:
-            remove_tree('build')
-        except OSError, _:
-            pass
-
-
     ## build what ?
-    log.info("starting to build...")
-    for target in all_targets:
-        target_name = target['name']
-        if (tobuild is not None) and not (tobuild in ('vsc-all', 'vsc-allinone' , target_name,)):
-            continue
-        if tobuild == 'vsc-all' and target_name == 'vsc-tools':
-            ## vsc-tools / allinone is not a default when vsc-all is selected
-            continue
+    return tobuild, all_targets
 
-        ## froim now on, build the exact targets.
-        os.environ[envname] = target_name
-        os.putenv(envname, target_name)
 
-        log.info("main: setup target_name %s target %s" % (target_name, target))
-        x = parse_target(target)
+def cleanup():
+    try:
+        remove_tree('build')
+    except OSError, _:
+        pass
 
-        cleanup()
 
-        setup(**x)
-        cleanup()
+def action_target(tobuild, target):
+    target_name = target['name']
+    if (tobuild is not None) and not (tobuild in ('vsc-all', 'vsc-allinone' , target_name,)):
+        return
+    if tobuild == 'vsc-all' and target_name == 'vsc-tools':
+        ## vsc-tools / allinone is not a default when vsc-all is selected
+        return
 
-main()
+    ## froim now on, build the exact targets.
+    os.environ[ENVNAME] = target_name
+    os.putenv(ENVNAME, target_name)
+    x = parse_target(target)
+
+    cleanup()
+
+    setup(**x)
+
+    cleanup()
+
+if __name__ == '__main__':
+
+    _tobuild, _all_targets = make_all_targets()
+
+
+    for _target in _all_targets:
+        action_target(_tobuild, _target)
+
