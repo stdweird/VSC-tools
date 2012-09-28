@@ -95,6 +95,7 @@ FAKE_SUBDIRECTORY_NAME = 'fake'
 MYMPIRUN_ALIASES = ['%smpirun' % x for x in ['i', 'ih', 'o', 'm', 'mh', 'mm', 'q', 'm2', 'm2h']] + ['myscoop']
 
 class vsc_easy_install(easy_install):
+    log.info('using vsc_easy_install')
     def install_egg_scripts(self, dist):
         orig_func = dist.metadata_listdir
         def new_func(txt):
@@ -117,6 +118,7 @@ class vsc_install_scripts(install_scripts):
     """Create the (fake) links for mympirun
         also remove .sh and .py extensions from the scripts
     """
+    log.info('using vsc_install_scripts')
     def __init__(self, *args):
         install_scripts.__init__(self, *args)
         self.original_outfiles = None
