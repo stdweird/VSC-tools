@@ -76,27 +76,25 @@ import sys
 from distutils import log  # also for setuptools
 from distutils.dir_util import remove_tree
 
-try:
-    ## setuptools makes copies of the scripts, does not preserve symlinks
-    #raise("a")  # to try distutils, uncomment
-    from setuptools import setup
-    from setuptools.command.install_scripts import install_scripts
-    from setuptools.command.easy_install import easy_install
-except:
-    from distutils.core import setup
-    from distutils.command.install_scripts import install_scripts
-    easy_install = object
-
-## 0 : WARN (default), 1 : INFO, 2 : DEBUG
-log.set_verbosity(1)
-
 ## generate these somehow from lib/vsc/mympirun/mpi/mpi.py
 FAKE_SUBDIRECTORY_NAME = 'fake'
 MYMPIRUN_ALIASES = ['%smpirun' % x for x in ['i', 'ih', 'o', 'm', 'mh', 'mm', 'q', 'm2', 'm2h']] + ['myscoop']
 
-class vsc_easy_install(easy_install):
-    log.info('using vsc_easy_install')
-    def install_egg_scripts(self, dist):
+## 0 : WARN (default), 1 : INFO, 2 : DEBUG
+log.set_verbosity(1)
+
+
+try:
+    ## setuptools makes copies of the scripts, does not preserve symlinks
+    #raise("no setuptools")  # to try distutils, uncomment
+    from setuptools import setup
+    from setuptools.command.install_scripts import install_scripts
+    from setuptools.command.easy_install import easy_install
+
+    ## uch uch, easy_install ignores the easy_install cmdclass
+    _orig_install_egg_scripts = sys.modules['setuptools.command.easy_install'].easy_install.install_egg_scripts
+
+    def _new_install_egg_scripts(self, dist):
         log.info('using vsc_easy_install install_egg_scripts')
         orig_func = dist.metadata_listdir
         def new_func(txt):
@@ -112,7 +110,13 @@ class vsc_easy_install(easy_install):
                         res[idx] = '%s/mpirun' % FAKE_SUBDIRECTORY_NAME
             return res
         dist.metadata_listdir = new_func
-        easy_install.install_egg_scripts(self, dist)
+        _orig_install_egg_scripts(self, dist)
+
+    sys.modules['setuptools.command.easy_install'].easy_install.install_egg_scripts = _new_install_egg_scripts
+
+except:
+    from distutils.core import setup
+    from distutils.command.install_scripts import install_scripts
 
 
 class vsc_install_scripts(install_scripts):
@@ -195,7 +199,7 @@ SHARED_TARGET = {'url':'http://hpcugent.github.com/VSC-tools',
                  'download_url':'https://github.com/hpcugent/VSC-tools',
                  'package_dir' : {'': 'lib'},
                  'cmdclass' : {"install_scripts": vsc_install_scripts,
-                               "easy_install":vsc_easy_install},
+                               },
                  }
 
 ## meta-package for allinone target
@@ -321,6 +325,7 @@ def main():
         x = parse_target(target)
 
         cleanup()
+
         setup(**x)
         cleanup()
 
