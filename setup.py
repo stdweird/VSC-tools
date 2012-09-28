@@ -193,7 +193,6 @@ SHARED_TARGET = {'url':'http://hpcugent.github.com/VSC-tools',
                  'package_dir' : {'': 'lib'},
                  'cmdclass' : {"install_scripts": vsc_install_scripts,
                                "easy_install":vsc_easy_install},
-                 'namespace_packages': ['vsc'],
                  }
 
 ## meta-package for allinone target
@@ -217,6 +216,7 @@ VSC_MYMPIRUN = {'name':'vsc-mympirun',
                 'install_requires':['vsc-base>=0.9.0'],
                 'packages':['vsc.mympirun', 'vsc.mympirun.mpi', 'vsc.mympirun.rm'],
                 'py_modules': ['vsc.__init__'],
+                'namespace_packages':['vsc'],
                 'scripts':['bin/mympirun.py', 'bin/pbsssh.sh', 'bin/sshsleep.sh'],
                 }
 
@@ -226,8 +226,9 @@ VSC_MYMPIRUN_SCOOP = {'name':'vsc-mympirun-scoop',
                       'maintainer':[sdw],
                       'install_requires':['vsc-mympirun>=3.0.0', 'scoop>=0.5.4'],
                       'packages':['vsc.mympirun.scoop'],
+                      'namespace_packages':['vsc', 'vsc.mympirun'],
                       'py_modules': ['vsc.__init__', 'vsc.mympirun.__init__'],
-                      #'scripts':['bin/mympirun.py'], is installed with vsc-mympirun
+                      #'scripts':['bin/mympirun.py'], ## is installed with vsc-mympirun, including myscoop
                       }
 
 
@@ -258,9 +259,9 @@ def main():
 
     envname = 'VSC_TOOLS_SETUP_TARGET'
     tobuild = os.environ.get(envname, 'vsc-all')  ## default all
-    log.info('main: going to build %s (set through env: %s)' % (tobuild, envname in os.environ))
+    log.debug('main: going to build %s (set through env: %s)' % (tobuild, envname in os.environ))
     if sys.argv[1] == 'vsc-showall':
-        print "Valid targets: %s" % " ".join(registered_names)
+        log.error("Valid targets: %s" % " ".join(registered_names))
         sys.exit(0)
     elif sys.argv[1] in registered_names:
         tobuild = sys.argv[1]
@@ -278,7 +279,7 @@ def main():
             if isinstance(v, (list, str)):
                 VSC_ALLINONE[k] += v
             else:
-                print 'ERROR: unsupported type cfgname %s key %s value %s' % (target['name'], k, v)
+                log.error('unsupported type cfgname %s key %s value %s' % (target['name'], k, v))
                 sys.exit(1)
 
     ## sanitize allinone/vsc-tools
