@@ -164,7 +164,7 @@ VSC_LDAP = {'name': 'vsc-ldap',
             'author': [ag, sdw, wdp],
             'maintainer': [ag],
             'packages': ['vsc/ldap'],
-            'namespace_packages': ['vsc', 'vsc.ldap'],
+            'namespace-packages': ['vsc', 'vsc.ldap'],
             'py_modules': [
                 'vsc.__init__',
                 'vsc.ldap.filter',
