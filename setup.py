@@ -73,6 +73,7 @@ import os
 FAKE_SUBDIRECTORY_NAME = 'fake'
 MYMPIRUN_ALIASES = ['%smpirun' % x for x in ['i', 'ih', 'o', 'm', 'mh', 'mm', 'q', 'm2', 'm2h']]
 
+
 class vsc_install_scripts(distutils.command.install_scripts.install_scripts):
     """Create the (fake) links for mympirun
         also remove .sh and .py extensions from the scripts
@@ -82,31 +83,31 @@ class vsc_install_scripts(distutils.command.install_scripts.install_scripts):
         self.original_outfiles = None
 
     def run(self):
-        ## old-style class
+        # old-style class
         distutils.command.install_scripts.install_scripts.run(self)
-        self.original_outfiles = self.get_outputs()[:] ## make a copy
-        self.outfiles = [] ## reset it
+        self.original_outfiles = self.get_outputs()[:]  # make a copy
+        self.outfiles = []  # reset it
         for script in self.original_outfiles:
-            ## remove suffixes for .py and .sh
+            # remove suffixes for .py and .sh
             if script.endswith(".py") or script.endswith(".sh"):
                 shutil.move(script, script[:-3])
                 script = script[:-3]
             self.outfiles.append(script)
 
             if script.endswith('/mympirun'):
-                ## make the fake dir, create all symlinks
+                # make the fake dir, create all symlinks
                 abs_fakepath = os.path.join(self.install_dir, FAKE_SUBDIRECTORY_NAME)
                 if not os.path.isdir(abs_fakepath):
                     os.mkdir(abs_fakepath)
-                ## make all links
-                ## they are create with relative paths !
+                # make all links
+                # they are create with relative paths !
 
                 rel_script = os.path.basename(script)
                 rel_script_dir = os.path.dirname(script)
 
-                ## abspath: all_syms = [os.path.join(self.install_dir, x) for x in MYMPIRUN_ALIASES]
-                ## abspath: all_syms.append(os.path.join(abs_fakepath, 'mpirun'))
-                ## with relative paths, we also ne to chdir for the fake/mpirun and ref to ../mympirun
+                # abspath: all_syms = [os.path.join(self.install_dir, x) for x in MYMPIRUN_ALIASES]
+                # abspath: all_syms.append(os.path.join(abs_fakepath, 'mpirun'))
+                # with relative paths, we also ne to chdir for the fake/mpirun and ref to ../mympirun
                 previous_pwd = os.getcwd()
                 os.chdir(rel_script_dir)
 
@@ -116,7 +117,7 @@ class vsc_install_scripts(distutils.command.install_scripts.install_scripts):
                     os.symlink(rel_script, sym_name)
                     self.outfiles.append(os.path.join(rel_script_dir, sym_name))
 
-                ## fake mpirun
+                # fake mpirun
                 os.chdir(abs_fakepath)
                 fake_mpirun = os.path.join(abs_fakepath, 'mpirun')
                 if os.path.exists(fake_mpirun):
@@ -136,25 +137,25 @@ wdp = ('Wouter Depypere', 'wouter.depypere@ugent.be')
 lm = ('Luis Fernando Munoz Meji­as', 'luis.munoz@ugent.be')
 
 ## shared target config
-SHARED_TARGET = {'url':'http://hpcugent.github.com/VSC-tools',
-                 'download_url':'https://github.com/hpcugent/VSC-tools',
-                 'package_dir' : {'': 'lib'},
-                 'cmdclass' : {"install_scripts": vsc_install_scripts}
+SHARED_TARGET = {'url': 'http://hpcugent.github.com/VSC-tools',
+                 'download_url': 'https://github.com/hpcugent/VSC-tools',
+                 'package_dir': {'': 'lib'},
+                 'cmdclass': {"install_scripts": vsc_install_scripts}
                  }
 
 ## meta-package for allinone target
-VSC_ALLINONE = {'name':'vsc-tools',
-                'version':'0.0.1',
+VSC_ALLINONE = {'name': 'vsc-tools',
+                'version': '0.0.1',
                 }
 
 ## specific info
-VSC_BASE = {'name' : 'vsc-base',
-            'version':"0.9.0" ,
-            'author':[sdw, jt],
-            'maintainer':[sdw, jt],
-            'packages':['vsc/utils'],
-            'py_modules':['vsc/__init__', 'vsc/dateandtime', 'vsc/fancylogger', 'vsc/generaloption'],
-            'scripts':['bin/logdaemon.py']
+VSC_BASE = {'name': 'vsc-base',
+            'version': "0.9.0",
+            'author': [sdw, jt],
+            'maintainer': [sdw, jt],
+            'packages': ['vsc/utils'],
+            'py_modules': ['vsc/__init__', 'vsc/dateandtime', 'vsc/fancylogger', 'vsc/generaloption'],
+            'scripts': ['bin/logdaemon.py']
             }
 
 
@@ -178,12 +179,12 @@ VSC_LDAP = {'name': 'vsc-ldap',
             }
 
 
-VSC_MYMPIRUN = {'name':'vsc-mympirun',
-                'version':'3.0.0',
-                'author':[sdw],
-                'maintainer':[sdw],
-                'packages':['vsc/mympirun', 'vsc/mympirun/mpi', 'vsc/mympirun/rm'],
-                'scripts':['bin/mympirun.py', 'bin/pbsssh.sh', 'bin/sshsleep.sh'],
+VSC_MYMPIRUN = {'name': 'vsc-mympirun',
+                'version': '3.0.0',
+                'author': [sdw],
+                'maintainer': [sdw],
+                'packages': ['vsc/mympirun', 'vsc/mympirun/mpi', 'vsc/mympirun/rm'],
+                'scripts': ['bin/mympirun.py', 'bin/pbsssh.sh', 'bin/sshsleep.sh'],
                 }
 
 all_targets = [
@@ -201,6 +202,7 @@ all_targets = [
 from distutils.core import setup
 import sys
 
+
 def parse_target(target):
     """Add some fields"""
     new_target = {}
@@ -216,12 +218,10 @@ def parse_target(target):
             new_target[k] = v
     return new_target
 
-
-
 registered_names = ['vsc-all', 'vsc-allinone'] + [x['name'] for x in all_targets]
 
 envname = 'VSC_TOOLS_SETUP_TARGET'
-tobuild = os.environ.get(envname, 'vsc-all')  ## default all
+tobuild = os.environ.get(envname, 'vsc-all')  # default all
 if sys.argv[1] == 'vsc-showall':
     print "Valid targets: %s" % " ".join(registered_names)
     sys.exit(0)
@@ -256,7 +256,7 @@ if tobuild == 'vsc-allinone':
 ## build what ?
 for target in all_targets:
     target_name = target['name']
-    if (tobuild is not None) and not (tobuild in ('vsc-all', 'vsc-allinone' , target_name,)):
+    if (tobuild is not None) and not (tobuild in ('vsc-all', 'vsc-allinone', target_name,)):
         continue
     if tobuild == 'vsc-all' and target_name == 'vsc-tools':
         ## vsc-tools / allinone is not a default when vsc-all is selected
