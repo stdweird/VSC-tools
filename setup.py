@@ -242,7 +242,7 @@ VSC_MYMPIRUN_SCOOP = {'name':'vsc-mympirun-scoop',
                       'author':[sdw],
                       'maintainer':[sdw],
                       'install_requires':['vsc-mympirun>=3.0.0', 'scoop>=0.5.4'],
-                      'packages':['vsc.mympirun.scoop'],
+                      'packages':['vsc.mympirun.scoop', 'vsc.mympirun.scoop.worker'],
                       'namespace_packages':['vsc', 'vsc.mympirun'],
                       'py_modules': ['vsc.__init__', 'vsc.mympirun.__init__'],
                       #'scripts':['bin/mympirun.py'], ## is installed with vsc-mympirun, including myscoop
