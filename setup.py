@@ -234,7 +234,7 @@ VSC_MYMPIRUN = {'name':'vsc-mympirun',
                 'packages':['vsc.mympirun', 'vsc.mympirun.mpi', 'vsc.mympirun.rm'],
                 'py_modules': ['vsc.__init__'],
                 'namespace_packages':['vsc'],
-                'scripts':['bin/mympirun.py', 'bin/pbsssh.sh', 'bin/sshsleep.sh'],
+                'scripts':['bin/mympirun.py', 'bin/pbsssh.sh', 'bin/sshsleep.sh', 'bin/mympisanity.py'],
                 }
 
 VSC_MYMPIRUN_SCOOP = {'name':'vsc-mympirun-scoop',
