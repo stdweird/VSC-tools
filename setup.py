@@ -139,30 +139,30 @@ class vsc_install_scripts(install_scripts):
         self.original_outfiles = None
 
     def run(self):
-        ## old-style class
+        # old-style class
         install_scripts.run(self)
 
-        self.original_outfiles = self.get_outputs()[:] ## make a copy
-        self.outfiles = [] ## reset it
+        self.original_outfiles = self.get_outputs()[:]  # make a copy
+        self.outfiles = []  # reset it
         for script in self.original_outfiles:
-            ## remove suffixes for .py and .sh
+            # remove suffixes for .py and .sh
             if script.endswith(".py") or script.endswith(".sh"):
                 shutil.move(script, script[:-3])
                 script = script[:-3]
             self.outfiles.append(script)
 
             if script.endswith('/mympirun'):
-                ## make the fake dir, create all symlinks
+                # make the fake dir, create all symlinks
 
-                ## make all links
-                ## they are create with relative paths !
+                # make all links
+                # they are create with relative paths !
 
                 rel_script = os.path.basename(script)
                 rel_script_dir = os.path.dirname(script)
 
-                ## abspath: all_syms = [os.path.join(self.install_dir, x) for x in MYMPIRUN_ALIASES]
-                ## abspath: all_syms.append(os.path.join(abs_fakepath, 'mpirun'))
-                ## with relative paths, we also ne to chdir for the fake/mpirun and ref to ../mympirun
+                # abspath: all_syms = [os.path.join(self.install_dir, x) for x in MYMPIRUN_ALIASES]
+                # abspath: all_syms.append(os.path.join(abs_fakepath, 'mpirun'))
+                # with relative paths, we also ne to chdir for the fake/mpirun and ref to ../mympirun
                 previous_pwd = os.getcwd()
 
                 os.chdir(rel_script_dir)
@@ -174,7 +174,7 @@ class vsc_install_scripts(install_scripts):
                     self.outfiles.append(newoutfile)
                     log.info("symlink %s to %s newoutfile %s" % (rel_script, sym_name, newoutfile))
 
-                ## fake mpirun
+                # fake mpirun
                 os.chdir(previous_pwd)
                 abs_fakepath = os.path.join(self.install_dir, FAKE_SUBDIRECTORY_NAME)
                 if not os.path.isdir(abs_fakepath):
@@ -183,7 +183,7 @@ class vsc_install_scripts(install_scripts):
                 else:
                     log.info("not creating abs_fakepath %s (already exists)" % abs_fakepath)
 
-                os.chdir(abs_fakepath) ## abs_fakepath si not always absolute
+                os.chdir(abs_fakepath)  # abs_fakepath si not always absolute
                 fake_mpirun = os.path.join(abs_fakepath, 'mpirun')
                 if os.path.exists(fake_mpirun):
                     os.remove(fake_mpirun)
@@ -213,17 +213,18 @@ SHARED_TARGET = {'url':'http://hpcugent.github.com/VSC-tools',
                  }
 
 ## meta-package for allinone target
-VSC_ALLINONE = {'name':'vsc-tools',
-                'version':'0.0.1',
+VSC_ALLINONE = {'name': 'vsc-tools',
+                'version': '0.0.1',
                 }
 
 ## specific info
 VSC_BASE = {'name' : 'vsc-base',
-            'version':"0.9.0" ,
-            'author':[sdw, jt],
-            'maintainer':[sdw, jt],
-            'packages':['vsc', 'vsc.utils'],
-            'scripts':['bin/logdaemon.py', 'bin/startlogdaemon.sh']
+            'version': "0.9.0" ,
+            'author': [sdw, jt],
+            'maintainer': [sdw, jt],
+            'install_requires': ['paycheck>=1.0.2'],
+            'packages': ['vsc', 'vsc.utils'],
+            'scripts': ['bin/logdaemon.py', 'bin/startlogdaemon.sh']
             }
 
 VSC_MYMPIRUN = {'name':'vsc-mympirun',
