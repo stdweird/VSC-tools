@@ -131,8 +131,12 @@ class Popen(subprocess.Popen):
 
 message = "Other end disconnected!"
 
-## SDW: add maxsize here
-def recv_some(p, t=.1, e=1, tr=5, stderr=0, maxread= -1):
+def recv_some(p, t=.1, e=False, tr=5, stderr=False, maxread= -1):
+    """
+    Changes made:
+      - add maxread here
+      - set e to False
+    """
     if tr < 1:
         tr = 1
     x = time.time() + t
