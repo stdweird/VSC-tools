@@ -296,7 +296,7 @@ def parse_target(target):
 
 
 def make_all_targets():
-    all_targets = [VSC_BASE, VSC_MYMPIRUN, VSC_MYMPIRUN_SCOOP, VSC_ALLINONE]
+    all_targets = [VSC_BASE, VSC_LDAP, VSC_MYMPIRUN, VSC_MYMPIRUN_SCOOP, VSC_ALLINONE]
     #all_targets = [VSC_BASE, VSC_ALLINONE]
     registered_names = ['vsc-all', 'vsc-allinone'] + [x['name'] for x in all_targets]
 
