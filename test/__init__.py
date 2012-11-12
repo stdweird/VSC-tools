@@ -1,6 +1,8 @@
 ##
-# Copyright 2011-2012 Ghent University
-# Copyright 2011-2012 Stijn De Weirdt
+#
+# Copyright 2012 Ghent University
+# Copyright 2012 Ghent University
+# Copyright 2012 Toon Willems
 #
 # This file is part of VSC-tools,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -23,10 +25,5 @@
 # You should have received a copy of the GNU General Public License
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 ##
-
-from vsc.mympirun.exceptions import WrongPythonVersionExcpetion, InitImportException
-import intelmpi, mpich, openmpi, qlogicmpi
-try:
-    import vsc.mympirun.scoop.myscoop
-except (WrongPythonVersionExcpetion, InitImportException):
-    pass  # Semi harmless
+import pkg_resources
+pkg_resources.declare_namespace(__name__)

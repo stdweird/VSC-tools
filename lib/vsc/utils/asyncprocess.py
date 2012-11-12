@@ -5,11 +5,15 @@
 #
 # http://code.activestate.com/recipes/440554/
 #
+# Copyright 2005 Ghent University
 # Copyright 2009-2012 Stijn De Weirdt
 #
 # This file is part of VSC-tools,
-# originally created by the HPC team of the University of Ghent (http://ugent.be/hpc).
-#
+# originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
+# with support of Ghent University (http://ugent.be/hpc),
+# the Flemish Supercomputer Centre (VSC) (https://vscentrum.be/nl/en),
+# the Hercules foundation (http://www.herculesstichting.be/in_English)
+# and the Department of Economy, Science and Innovation (EWI) (http://www.ewi-vlaanderen.be/en).
 #
 # http://github.com/hpcugent/VSC-tools
 #
@@ -17,7 +21,7 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation v2.
 #
-# EasyBuild is distributed in the hope that it will be useful,
+# VSC-tools is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
@@ -131,8 +135,12 @@ class Popen(subprocess.Popen):
 
 message = "Other end disconnected!"
 
-## SDW: add maxsize here
-def recv_some(p, t=.1, e=1, tr=5, stderr=0, maxread= -1):
+def recv_some(p, t=.1, e=False, tr=5, stderr=False, maxread= -1):
+    """
+    Changes made:
+      - add maxread here
+      - set e to False
+    """
     if tr < 1:
         tr = 1
     x = time.time() + t
