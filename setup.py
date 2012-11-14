@@ -3,6 +3,7 @@
 ##
 # Copyright 2009-2012 Ghent University
 # Copyright 2009-2012 Stijn De Weirdt
+# Copyright 2012 Andy Georges
 #
 # This file is part of VSC-tools,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -228,6 +229,26 @@ VSC_BASE = {'name' : 'vsc-base',
             'scripts': ['bin/logdaemon.py', 'bin/startlogdaemon.sh']
             }
 
+
+VSC_LDAP = {'name': 'vsc-ldap',
+            'version': '0.3.0',
+            'author': [ag, sdw, wdp],
+            'maintainer': [ag],
+            'packages': ['vsc/ldap'],
+            'namespace_packages': ['vsc', 'vsc.ldap'],
+            'py_modules': [
+                'vsc.__init__',
+                'vsc.ldap.filter',
+                'vsc.ldap.group',
+                'vsc.ldap.ldap_utils',
+                'vsc.ldap.project',
+                'vsc.ldap.utils',
+                'vsc.ldap.user',
+                'vsc.ldap.vo',
+                ],
+            'scripts': []
+            }
+
 VSC_MYMPIRUN = {'name':'vsc-mympirun',
                 'version':'3.0.0',
                 'author':[sdw],
@@ -275,7 +296,7 @@ def parse_target(target):
 
 
 def make_all_targets():
-    all_targets = [VSC_BASE, VSC_MYMPIRUN, VSC_MYMPIRUN_SCOOP, VSC_ALLINONE]
+    all_targets = [VSC_BASE, VSC_LDAP, VSC_MYMPIRUN, VSC_MYMPIRUN_SCOOP, VSC_ALLINONE]
     #all_targets = [VSC_BASE, VSC_ALLINONE]
     registered_names = ['vsc-all', 'vsc-allinone'] + [x['name'] for x in all_targets]
 
