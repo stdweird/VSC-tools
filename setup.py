@@ -207,8 +207,8 @@ wdp = ('Wouter Depypere', 'wouter.depypere@ugent.be')
 lm = ('Luis Fernando Munoz Meji­as', 'luis.munoz@ugent.be')
 
 ## shared target config
-SHARED_TARGET = {'url':'http://hpcugent.github.com/VSC-tools',
-                 'download_url':'https://github.com/hpcugent/VSC-tools',
+SHARED_TARGET = {'url': 'http://hpcugent.github.com/VSC-tools',
+                 'download_url': 'https://github.com/hpcugent/VSC-tools',
                  'package_dir' : {'': 'lib'},
                  'cmdclass' : {"install_scripts": vsc_install_scripts,
                                },
@@ -222,9 +222,9 @@ VSC_ALLINONE = {'name': 'vsc-tools',
 ## specific info
 VSC_BASE = {'name' : 'vsc-base',
             'version': "0.9" ,
-            'author': [sdw, jt],
-            'maintainer': [sdw, jt],
-            'install_requires': ['paycheck>=1.0.2'],
+            'author': [sdw, jt, ag],
+            'maintainer': [sdw, jt, ag],
+            'install_requires': [],
             'packages': ['vsc', 'vsc.utils'],
             'scripts': ['bin/logdaemon.py', 'bin/startlogdaemon.sh']
             }
