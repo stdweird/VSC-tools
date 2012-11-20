@@ -216,12 +216,12 @@ SHARED_TARGET = {'url':'http://hpcugent.github.com/VSC-tools',
 
 ## meta-package for allinone target
 VSC_ALLINONE = {'name': 'vsc-tools',
-                'version': '0.0.1',
+                'version': '0.9',
                 }
 
 ## specific info
 VSC_BASE = {'name' : 'vsc-base',
-            'version': "0.9.0" ,
+            'version': "0.9" ,
             'author': [sdw, jt],
             'maintainer': [sdw, jt],
             'install_requires': ['paycheck>=1.0.2'],
@@ -231,7 +231,7 @@ VSC_BASE = {'name' : 'vsc-base',
 
 
 VSC_LDAP = {'name': 'vsc-ldap',
-            'version': '0.3.0',
+            'version': '0.9',
             'author': [ag, sdw, wdp],
             'maintainer': [ag],
             'packages': ['vsc/ldap'],
