@@ -237,17 +237,9 @@ VSC_LDAP = {
     'version': '0.9',
     'author': [ag, sdw, wdp],
     'maintainer': [ag],
-    'packages': ['vsc/ldap'],
-    'namespace_packages': ['vsc', 'vsc.ldap'],
+    'packages': ['vsc.ldap'],
     'py_modules': [
         'vsc.__init__',
-        'vsc.ldap.filter',
-        'vsc.ldap.group',
-        'vsc.ldap.ldap_utils',
-        'vsc.ldap.project',
-        'vsc.ldap.utils',
-        'vsc.ldap.user',
-        'vsc.ldap.vo',
         ],
     'scripts': [],
     'bdist_rpm': {
