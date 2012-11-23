@@ -389,7 +389,7 @@ def build_setup_cfg_for_bdist_rpm(target):
     del target['bdist_rpm']
 
     s = ["[bdist_rpm]"]
-    s += [ "%s = %s" % (key, sanitize(value)) for (key, value) in bdist_rpm.items()]
+    s += ["%s = %s" % (key, sanitize(value)) for (key, value) in bdist_rpm.items()]
 
     setup_cfg.write("\n".join(s))
     setup_cfg.close()
