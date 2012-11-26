@@ -34,12 +34,19 @@
 ALL_PACKAGES=`python ./setup.py --name 2>/dev/null | tr "\n" " "`
 
 for package in $ALL_PACKAGES; do
+
   echo $package
   python ./setup.py ${package} bdist_rpm
   rpm_target=`ls dist/${package}*noarch.rpm`
   rpm_target_name=`basename ${rpm_target}`
+
+  # user specified requirements can be found in setup.cfg
+  requirements=`grep "requires" setup.cfg | cut -d" " -f3- | tr "," "|"`
+
   rpmrebuild --define "_rpmfilename python-${rpm_target_name}" \
              --change-spec-preamble="sed -e 's/^Name:\(\s\s*\)\(.*\)/Name:\1python-\2/'" \
-             --change-spec-provides="sed 's/${package}/python-${package}/g'" \
+             --change-spec-provides="sed -e 's/${package}/python-${package}/g'" \
+             --change-spec-requires="sed -r 's/^Requires:(\s\s*)(${requirements})/Requires:\1python-\2/'" \
+             --change-spec-preamble="sed -e 's/^\(Release:.*\)\s*$/\1.ug/'" \
              -n -p ${rpm_target}
 done
