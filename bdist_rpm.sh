@@ -49,7 +49,7 @@ do
 done
 
 if [ -z "$all_packages" ]; then
-  ALL_PACKAGES=`python ./setup.py --name 2>/dev/null | tr "\n" " "`
+  ALL_PACKAGES=`python ./setup.py --name 2>/dev/null | grep -v "removing 'build'" | tr "\n" " "`
 else
   ALL_PACKAGES=$all_packages
 fi
