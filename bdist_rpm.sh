@@ -29,9 +29,30 @@
 # to indicate their contents in a more appropriate way. We do not do this for the packages when shipped to
 # PyPi, since it is pretty obvious these are Python packages in any case.
 
+all_packages=
+edit=
+release=
 
+while getopts er:p:h name
+do
+  case $name in
+    e) edit="-e";;
+    r) release="$OPTARG";;
+    p) all_packages="$OPTARG";;
+    h) printf "Usage: %s [-e] [-r RELEASE] [-p PACKAGE]" $0
+       echo
+       echo "  -e            Edit the generated spec file before rebuilding the RPM"
+       echo "  -r [RELEASE]  Specify the RELEASE tag given to the RPM. Automagically adds .ug.noarch"
+       echo "  -p [PACKAGE]  Specify a single PACKAGE to be built. Default builds all packages."
+       exit 1;;
+  esac
+done
 
-ALL_PACKAGES=`python ./setup.py --name 2>/dev/null | tr "\n" " "`
+if [ -z "$all_packages" ]; then
+  ALL_PACKAGES=`python ./setup.py --name 2>/dev/null | grep -v "removing 'build'" | tr "\n" " "`
+else
+  ALL_PACKAGES=$all_packages
+fi
 
 for package in $ALL_PACKAGES; do
 
@@ -42,11 +63,18 @@ for package in $ALL_PACKAGES; do
 
   # user specified requirements can be found in setup.cfg
   requirements=`grep "requires" setup.cfg | cut -d" " -f3- | tr "," "|"`
+  if [ -z "$requirements" ]; then
+    requirements="no-match-etc-etc-etc"
+  fi
 
-  rpmrebuild --define "_rpmfilename python-${rpm_target_name}" \
+  if [ -z "$release" ]; then
+    release="\\2"
+  fi
+
+  rpmrebuild --define "_rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm" \
              --change-spec-preamble="sed -e 's/^Name:\(\s\s*\)\(.*\)/Name:\1python-\2/'" \
              --change-spec-provides="sed -e 's/${package}/python-${package}/g'" \
              --change-spec-requires="sed -r 's/^Requires:(\s\s*)(${requirements})/Requires:\1python-\2/'" \
-             --change-spec-preamble="sed -e 's/^\(Release:.*\)\s*$/\1.ug/'" \
-             -n -p ${rpm_target}
+             --change-spec-preamble="sed -e 's/^\(Release:\s\s*\)\(.*\)\s*$/\1${release}.ug/'" \
+             ${edit} -n -p ${rpm_target}
 done

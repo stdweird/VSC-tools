@@ -274,7 +274,6 @@ VSC_MYMPIRUN_SCOOP = {
 
 def parse_target(target):
     """Add some fields"""
-    print "parse target: %s" % (target)
     new_target = {}
     new_target.update(SHARED_TARGET)
     for k, v in target.items():
@@ -287,12 +286,10 @@ def parse_target(target):
         else:
             new_target[k] = type(v)()
             new_target[k] += v
-    log.info("parse_target: new_target %s" % new_target)
     return new_target
 
 
 def make_all_targets():
-    print "make_all_targets"
     all_targets = [VSC_BASE, VSC_LDAP, VSC_MYMPIRUN, VSC_MYMPIRUN_SCOOP, VSC_ALLINONE]
     #all_targets = [VSC_BASE, VSC_ALLINONE]
     registered_names = ['vsc-all', 'vsc-allinone'] + [x['name'] for x in all_targets]
@@ -306,7 +303,6 @@ def make_all_targets():
         tobuild = sys.argv[1]
         sys.argv.pop(1)
 
-    print "allinone"
     ## create allinone / vsc-tools target
     for target in all_targets:
         for k, v in target.items():
@@ -325,7 +321,6 @@ def make_all_targets():
                 log.error('unsupported type cfgname %s key %s value %s' % (target['name'], k, v))
                 sys.exit(1)
 
-    print "sanitize"
     ## sanitize allinone/vsc-tools
     for k, v in VSC_ALLINONE.items():
         if isinstance(v, list):
@@ -342,7 +337,7 @@ def make_all_targets():
 
 def cleanup():
     try:
-        remove_tree('build')
+        remove_tree('build', verbose=False)
     except OSError, _:
         pass
 
@@ -375,7 +370,7 @@ def build_setup_cfg_for_bdist_rpm(target):
     if 'install_requires' in target:
         s += ["requires = %s" % (sanitize(target['install_requires']))]
 
-    setup_cfg.write("\n".join(s))
+    setup_cfg.write("\n".join(s)+"\n")
     setup_cfg.close()
 
 
