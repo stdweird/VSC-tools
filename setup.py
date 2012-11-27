@@ -318,7 +318,9 @@ def make_all_targets():
             if isinstance(v, (list, str)):
                 VSC_ALLINONE[k] += v
             elif isinstance(v, dict):
-                VSC_ALLINONE[k].update(v) ## this isn't really right, but we need this to set the bdist_rpm options and we're not like ever going to generate a single RPM for everything
+                # this isn't really right, but we need this to set the bdist_rpm options and we're not like ever
+                # going to generate a single RPM for everything
+                VSC_ALLINONE[k].update(v)
             else:
                 log.error('unsupported type cfgname %s key %s value %s' % (target['name'], k, v))
                 sys.exit(1)
