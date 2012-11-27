@@ -71,10 +71,10 @@ for package in $ALL_PACKAGES; do
     release="\\2"
   fi
 
-  rpmrebuild --define "_rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.rpm" \
+  rpmrebuild --define "_rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm" \
              --change-spec-preamble="sed -e 's/^Name:\(\s\s*\)\(.*\)/Name:\1python-\2/'" \
              --change-spec-provides="sed -e 's/${package}/python-${package}/g'" \
              --change-spec-requires="sed -r 's/^Requires:(\s\s*)(${requirements})/Requires:\1python-\2/'" \
-             --change-spec-preamble="sed -e 's/^\(Release:\s\s*\)\(.*\)\s*$/\1${release}.ug.noarch/'" \
+             --change-spec-preamble="sed -e 's/^\(Release:\s\s*\)\(.*\)\s*$/\1${release}.ug/'" \
              ${edit} -n -p ${rpm_target}
 done
