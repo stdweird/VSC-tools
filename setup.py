@@ -207,69 +207,65 @@ wdp = ('Wouter Depypere', 'wouter.depypere@ugent.be')
 lm = ('Luis Fernando Munoz Meji­as', 'luis.munoz@ugent.be')
 
 ## shared target config
-SHARED_TARGET = {'url':'http://hpcugent.github.com/VSC-tools',
-                 'download_url':'https://github.com/hpcugent/VSC-tools',
-                 'package_dir' : {'': 'lib'},
-                 'cmdclass' : {"install_scripts": vsc_install_scripts,
-                               },
-                 }
+SHARED_TARGET = {
+    'url': 'http://hpcugent.github.com/VSC-tools',
+    'download_url': 'https://github.com/hpcugent/VSC-tools',
+    'package_dir': {'': 'lib'},
+    'cmdclass': {
+        "install_scripts": vsc_install_scripts,
+    },
+}
 
 ## meta-package for allinone target
-VSC_ALLINONE = {'name': 'vsc-tools',
-                'version': '0.0.1',
-                }
+VSC_ALLINONE = {
+    'name': 'vsc-tools',
+    'version': '0.9',
+}
 
 ## specific info
-VSC_BASE = {'name' : 'vsc-base',
-            'version': "0.9.0" ,
-            'author': [sdw, jt],
-            'maintainer': [sdw, jt],
-            'install_requires': ['paycheck>=1.0.2'],
-            'packages': ['vsc', 'vsc.utils'],
-            'scripts': ['bin/logdaemon.py', 'bin/startlogdaemon.sh']
-            }
+VSC_BASE = {
+    'name': 'vsc-base',
+    'version': '0.90',
+    'author': [sdw, jt, ag],
+    'maintainer': [sdw, jt, ag],
+    'packages': ['vsc', 'vsc.utils'],
+    'scripts': ['bin/logdaemon.py', 'bin/startlogdaemon.sh'],
+}
 
+VSC_LDAP = {
+    'name': 'vsc-ldap',
+    'version': '0.90',
+    'author': [ag, sdw, wdp],
+    'maintainer': [ag],
+    'packages': ['vsc.ldap'],
+    'namespace_packages': ['vsc'],
+    'scripts': [],
+    'install_requires': ['vsc-base >= 0.90'],
+}
 
-VSC_LDAP = {'name': 'vsc-ldap',
-            'version': '0.3.0',
-            'author': [ag, sdw, wdp],
-            'maintainer': [ag],
-            'packages': ['vsc/ldap'],
-            'namespace_packages': ['vsc', 'vsc.ldap'],
-            'py_modules': [
-                'vsc.__init__',
-                'vsc.ldap.filter',
-                'vsc.ldap.group',
-                'vsc.ldap.ldap_utils',
-                'vsc.ldap.project',
-                'vsc.ldap.utils',
-                'vsc.ldap.user',
-                'vsc.ldap.vo',
-                ],
-            'scripts': []
-            }
+VSC_MYMPIRUN = {
+    'name': 'vsc-mympirun',
+    'version': '3.0.0',
+    'author': [sdw],
+    'maintainer': [sdw],
+    'packages': ['vsc.mympirun', 'vsc.mympirun.mpi', 'vsc.mympirun.rm'],
+    'py_modules': ['vsc.__init__'],
+    'namespace_packages': ['vsc'],
+    'scripts': ['bin/mympirun.py', 'bin/pbsssh.sh', 'bin/sshsleep.sh', 'bin/mympisanity.py'],
+    'install_requires': ['vsc-base >= 0.90'],
+}
 
-VSC_MYMPIRUN = {'name':'vsc-mympirun',
-                'version':'3.0.0',
-                'author':[sdw],
-                'maintainer':[sdw],
-                'install_requires':['vsc-base>=0.9.0'],
-                'packages':['vsc.mympirun', 'vsc.mympirun.mpi', 'vsc.mympirun.rm'],
-                'py_modules': ['vsc.__init__'],
-                'namespace_packages':['vsc'],
-                'scripts':['bin/mympirun.py', 'bin/pbsssh.sh', 'bin/sshsleep.sh', 'bin/mympisanity.py'],
-                }
-
-VSC_MYMPIRUN_SCOOP = {'name':'vsc-mympirun-scoop',
-                      'version':'3.0.0',
-                      'author':[sdw],
-                      'maintainer':[sdw],
-                      'install_requires':['vsc-mympirun>=3.0.0', 'scoop>=0.5.4'],
-                      'packages':['vsc.mympirun.scoop', 'vsc.mympirun.scoop.worker'],
-                      'namespace_packages':['vsc', 'vsc.mympirun'],
-                      'py_modules': ['vsc.__init__', 'vsc.mympirun.__init__'],
-                      #'scripts':['bin/mympirun.py'], ## is installed with vsc-mympirun, including myscoop
-                      }
+VSC_MYMPIRUN_SCOOP = {
+    'name': 'vsc-mympirun-scoop',
+    'version': '3.0.0',
+    'author': [sdw],
+    'maintainer': [sdw],
+    'packages': ['vsc.mympirun.scoop', 'vsc.mympirun.scoop.worker'],
+    'namespace_packages': ['vsc', 'vsc.mympirun'],
+    'py_modules': ['vsc.__init__', 'vsc.mympirun.__init__'],
+    #'scripts':['bin/mympirun.py'], ## is installed with vsc-mympirun, including myscoop
+    'install_requires': ['vsc-mympirun >= 3.0.0', 'scoop >= 0.5.4'],
+}
 
 
 ###
@@ -290,9 +286,7 @@ def parse_target(target):
         else:
             new_target[k] = type(v)()
             new_target[k] += v
-    log.info("parse_target: new_target %s" % new_target)
     return new_target
-
 
 
 def make_all_targets():
@@ -319,6 +313,10 @@ def make_all_targets():
 
             if isinstance(v, (list, str)):
                 VSC_ALLINONE[k] += v
+            elif isinstance(v, dict):
+                # this isn't really right, but we need this to set the bdist_rpm options and we're not like ever
+                # going to generate a single RPM for everything
+                VSC_ALLINONE[k].update(v)
             else:
                 log.error('unsupported type cfgname %s key %s value %s' % (target['name'], k, v))
                 sys.exit(1)
@@ -339,35 +337,63 @@ def make_all_targets():
 
 def cleanup():
     try:
-        remove_tree('build')
+        remove_tree('build', verbose=False)
     except OSError, _:
         pass
 
 
+def sanitize(v):
+    """Transforms v into a sensible string for use in setup.cfg."""
+    if isinstance(v, str):
+        return v
+
+    if isinstance(v, list):
+        return ",".join(v)
+
+def build_setup_cfg_for_bdist_rpm(target):
+    """Generates a setup.cfg on a per-target basis.
+
+    Stores the 'install-requires' in the [bdist_rpm] section
+
+    @type target: dict
+
+    @param target: specifies the options to be passed to setup()
+    """
+
+    try:
+        setup_cfg = open('setup.cfg', 'w')  # and truncate
+    except (IOError, OSError), err:
+        print "Cannot create setup.cfg for target %s: %s" % (target['name'], err)
+        sys.exit(1)
+
+    s = ["[bdist_rpm]"]
+    if 'install_requires' in target:
+        s += ["requires = %s" % (sanitize(target['install_requires']))]
+
+    setup_cfg.write("\n".join(s)+"\n")
+    setup_cfg.close()
+
+
 def action_target(tobuild, target):
     target_name = target['name']
-    if (tobuild is not None) and not (tobuild in ('vsc-all', 'vsc-allinone' , target_name,)):
+    if (tobuild is not None) and not (tobuild in ('vsc-all', 'vsc-allinone', target_name,)):
         return
     if tobuild == 'vsc-all' and target_name == 'vsc-tools':
         ## vsc-tools / allinone is not a default when vsc-all is selected
         return
 
-    ## froim now on, build the exact targets.
+    ## from now on, build the exact targets.
     os.environ[ENVNAME] = target_name
     os.putenv(ENVNAME, target_name)
-    x = parse_target(target)
-
     cleanup()
-
+    build_setup_cfg_for_bdist_rpm(target)
+    x = parse_target(target)
     setup(**x)
-
     cleanup()
 
 if __name__ == '__main__':
 
     _tobuild, _all_targets = make_all_targets()
 
-
     for _target in _all_targets:
         action_target(_tobuild, _target)
-
