@@ -225,23 +225,23 @@ VSC_ALLINONE = {
 ## specific info
 VSC_BASE = {
     'name': 'vsc-base',
-    'version': '0.90',
+    'version': '0.92',
     'author': [sdw, jt, ag],
     'maintainer': [sdw, jt, ag],
     'packages': ['vsc', 'vsc.utils'],
-    'provides': ['python-vsc-packages-common = 0.5' , 'python-vsc-packages-logging = 0.14', 'python-vsc-packages-utils = 0.11'],
+    'provides': ['python-vsc-packages-common = 0.5', 'python-vsc-packages-logging = 0.14', 'python-vsc-packages-utils = 0.11'],
     'scripts': ['bin/logdaemon.py', 'bin/startlogdaemon.sh'],
 }
 
 VSC_LDAP = {
     'name': 'vsc-ldap',
-    'version': '0.90',
+    'version': '0.92',
     'author': [ag, sdw, wdp],
     'maintainer': [ag],
     'packages': ['vsc.ldap'],
     'namespace_packages': ['vsc'],
     'scripts': [],
-    'provides': ['python-vsc-packages-ldap >= 0.3'],
+    'provides': ['python-vsc-packages-ldap = 0.3'],
     'install_requires': ['vsc-base >= 0.90'],
 }
 
