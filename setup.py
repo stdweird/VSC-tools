@@ -229,6 +229,7 @@ VSC_BASE = {
     'author': [sdw, jt, ag],
     'maintainer': [sdw, jt, ag],
     'packages': ['vsc', 'vsc.utils'],
+    'provides': ['python-vsc-packages-common' , 'python-vsc-packages-logging', 'python-vsc-packages-utils'],
     'scripts': ['bin/logdaemon.py', 'bin/startlogdaemon.sh'],
 }
 
@@ -240,6 +241,7 @@ VSC_LDAP = {
     'packages': ['vsc.ldap'],
     'namespace_packages': ['vsc'],
     'scripts': [],
+    'provides': ['python-vsc-packages-ldap'],
     'install_requires': ['vsc-base >= 0.90'],
 }
 
@@ -369,6 +371,9 @@ def build_setup_cfg_for_bdist_rpm(target):
     s = ["[bdist_rpm]"]
     if 'install_requires' in target:
         s += ["requires = %s" % (sanitize(target['install_requires']))]
+
+    s += ["provides = %s" % (sanitize((target['provides'])))]
+    target.pop('provides')
 
     setup_cfg.write("\n".join(s)+"\n")
     setup_cfg.close()
