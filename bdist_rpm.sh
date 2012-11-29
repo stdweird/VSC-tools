@@ -62,7 +62,7 @@ for package in $ALL_PACKAGES; do
   rpm_target_name=`basename ${rpm_target}`
 
   # user specified requirements can be found in setup.cfg
-  requirements=`grep "requires" setup.cfg | cut -d" " -f3- | tr "," "|"`
+  requirements=`grep "requires" setup.cfg | cut -d" " -f3- | tr "," "\n" | grep -v "^python-" | tr "\n" "|" | sed -e 's/|$//'`
   if [ -z "$requirements" ]; then
     requirements="no-match-etc-etc-etc"
   fi
