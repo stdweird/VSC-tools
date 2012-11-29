@@ -241,7 +241,7 @@ VSC_LDAP = {
     'packages': ['vsc.ldap'],
     'namespace_packages': ['vsc'],
     'scripts': [],
-    'provides': ['python-vsc-packages-ldap = 0.3']
+    'provides': ['python-vsc-packages-ldap = 0.3'],
     'install_requires': [
         'vsc-base >= 0.90',
         'python-ldap >= 0.2.2',
