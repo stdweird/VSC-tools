@@ -225,21 +225,23 @@ VSC_ALLINONE = {
 ## specific info
 VSC_BASE = {
     'name': 'vsc-base',
-    'version': '0.90',
+    'version': '0.92',
     'author': [sdw, jt, ag],
     'maintainer': [sdw, jt, ag],
     'packages': ['vsc', 'vsc.utils'],
+    'provides': ['python-vsc-packages-common = 0.5', 'python-vsc-packages-logging = 0.14', 'python-vsc-packages-utils = 0.11'],
     'scripts': ['bin/logdaemon.py', 'bin/startlogdaemon.sh'],
 }
 
 VSC_LDAP = {
     'name': 'vsc-ldap',
-    'version': '0.90',
+    'version': '0.92',
     'author': [ag, sdw, wdp],
     'maintainer': [ag],
     'packages': ['vsc.ldap'],
     'namespace_packages': ['vsc'],
     'scripts': [],
+    'provides': ['python-vsc-packages-ldap = 0.3'],
     'install_requires': ['vsc-base >= 0.90'],
 }
 
@@ -369,6 +371,9 @@ def build_setup_cfg_for_bdist_rpm(target):
     s = ["[bdist_rpm]"]
     if 'install_requires' in target:
         s += ["requires = %s" % (sanitize(target['install_requires']))]
+
+    s += ["provides = %s" % (sanitize((target['provides'])))]
+    target.pop('provides')
 
     setup_cfg.write("\n".join(s)+"\n")
     setup_cfg.close()
