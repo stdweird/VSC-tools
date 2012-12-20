@@ -40,24 +40,24 @@ and send a new command based on that response?
 
 Now there is a solution.
 The included subprocess.Popen subclass adds three new commonly used methods:
- recv(maxsize=None)
- recv_err(maxsize=None)
- and send(input)
+ - C{recv(maxsize=None)}
+ - C{recv_err(maxsize=None)}
+ - and C{send(input)}
 
 along with a utility method:
- send_recv(input='', maxsize=None).
+ - {send_recv(input='', maxsize=None)}.
 
-recv() and recv_err() both read at most maxsize bytes from the started subprocess.
-send() sends strings to the started subprocess. send_recv() will send the provided input,
-and read up to maxsize bytes from both stdout and stderr.
+C{recv()} and C{recv_err()} both read at most C{maxsize} bytes from the started subprocess.
+C{send()} sends strings to the started subprocess. C{send_recv()} will send the provided input,
+and read up to C{maxsize} bytes from both C{stdout} and C{stderr}.
 
 If any of the pipes are closed, the attributes for those pipes will be set to None,
 and the methods will return None.
 
-- downloaded 05/08/2010
-- modified
--- added STDOUT handle
--- added maxread to recv_some (2012-08-30)
+  - downloaded 05/08/2010
+  - modified
+    - added STDOUT handle
+    - added maxread to recv_some (2012-08-30)
 """
 
 import errno
@@ -170,5 +170,3 @@ def send_all(p, data):
         if sent is None:
             raise Exception(message)
         data = buffer(data, sent)
-
-
