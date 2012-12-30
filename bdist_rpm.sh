@@ -33,6 +33,13 @@ all_packages=
 edit=
 release=
 
+which rpmrebuild >& /dev/null
+if [ $? -gt 0 ]
+then
+    echo "Missing rpmrebuild"
+    exit 1
+fi
+
 while getopts er:p:h name
 do
   case $name in
@@ -49,16 +56,17 @@ do
 done
 
 if [ -z "$all_packages" ]; then
-  ALL_PACKAGES=`python ./setup.py --name 2>/dev/null | grep -v "removing 'build'" | tr "\n" " "`
+  ALL_PACKAGES=`python ./shared_setup.py`
 else
   ALL_PACKAGES=$all_packages
 fi
 
 for package in $ALL_PACKAGES; do
-
-  echo $package
-  python ./setup.py ${package} bdist_rpm
-  rpm_target=`ls dist/${package}*noarch.rpm`
+  echo "Building RPM for $package"
+  setup=`echo ${package#vsc-} |tr '-' '_'`
+  python ./setup_${setup}.py  bdist_rpm
+  # get latest one (name-version syntax)
+  rpm_target=`ls -t dist/${package}-[0-9]*noarch.rpm | head -1`
   rpm_target_name=`basename ${rpm_target}`
 
   # user specified requirements can be found in setup.cfg
@@ -77,4 +85,5 @@ for package in $ALL_PACKAGES; do
              --change-spec-requires="sed -r 's/^Requires:(\s\s*)(${requirements})/Requires:\1python-\2/'" \
              --change-spec-preamble="sed -e 's/^\(Release:\s\s*\)\(.*\)\s*$/\1${release}.ug/'" \
              ${edit} -n -p ${rpm_target}
+   echo "Finished building RPM for $package"
 done
