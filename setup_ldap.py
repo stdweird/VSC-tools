@@ -27,21 +27,22 @@
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 # #
 """
-VSC-tools base distribution setup.py
+Setup for the VSC-tools ldap utilities
 """
-from shared_setup import ag, jt, sdw
+
+from shared_setup import ag, sdw, wdp
 from shared_setup import action_target
 
 PACKAGE = {
-    'name': 'vsc-base',
-    'version': '0.95',
-    'author': [sdw, jt, ag],
-    'maintainer': [sdw, jt, ag],
-    'packages': ['vsc', 'vsc.utils'],
-    'provides': ['python-vsc-packages-common = 0.5',
-                 'python-vsc-packages-logging = 0.14',
-                 'python-vsc-packages-utils = 0.11'],
-    'scripts': ['bin/logdaemon.py', 'bin/startlogdaemon.sh'],
+    'name': 'vsc-ldap',
+    'install_requires': ['vsc-base >= 0.90'],
+    'version': '0.92',
+    'author': [ag, sdw, wdp],
+    'maintainer': [ag],
+    'packages': ['vsc.ldap'],
+    'namespace_packages': ['vsc'],
+    'scripts': [],
+    'provides': ['python-vsc-packages-ldap = 0.3'],
 }
 
 if __name__ == '__main__':

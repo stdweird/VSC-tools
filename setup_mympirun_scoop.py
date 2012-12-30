@@ -27,22 +27,32 @@
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 # #
 """
-VSC-tools base distribution setup.py
+Setup for the SCOOP functionality of mympirun
 """
-from shared_setup import ag, jt, sdw
+
+from shared_setup import sdw
 from shared_setup import action_target
+from setup_mympirun import mympirun_vsc_install_scripts
+
+
 
 PACKAGE = {
-    'name': 'vsc-base',
-    'version': '0.95',
-    'author': [sdw, jt, ag],
-    'maintainer': [sdw, jt, ag],
-    'packages': ['vsc', 'vsc.utils'],
-    'provides': ['python-vsc-packages-common = 0.5',
-                 'python-vsc-packages-logging = 0.14',
-                 'python-vsc-packages-utils = 0.11'],
-    'scripts': ['bin/logdaemon.py', 'bin/startlogdaemon.sh'],
+    'name': 'vsc-mympirun-scoop',
+    'install_requires': ['vsc-mympirun >= 3.0.5',
+                         'scoop >= 0.5.4'
+                         ],
+    'version': '3.0.5',
+    'author': [sdw],
+    'maintainer': [sdw],
+    'packages': ['vsc.mympirun.scoop', 'vsc.mympirun.scoop.worker'],
+    'namespace_packages': ['vsc', 'vsc.mympirun'],
+    'py_modules': ['vsc.__init__', 'vsc.mympirun.__init__'],
+    # 'scripts':['bin/mympirun.py'], ## is installed with vsc-mympirun, including myscoop
+    'cmdclass': {
+        "install_scripts": mympirun_vsc_install_scripts,  # this is required for easy_install for the egg_install_scripts
+    },
+
 }
 
 if __name__ == '__main__':
-    action_target(PACKAGE)
+    action_target(PACKAGE, extra_sdist=['setup_mympirun.py'])
