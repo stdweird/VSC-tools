@@ -1,6 +1,8 @@
 #!/usr/bin/env python
-##
-# Copyright 2012 Ghent University
+# -*- coding: latin-1 -*-
+# #
+# Copyright 2009-2012 Ghent University
+# Copyright 2009-2012 Stijn De Weirdt
 # Copyright 2012 Andy Georges
 #
 # This file is part of VSC-tools,
@@ -23,29 +25,34 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
-##
+# #
 """
-Module offering the Singleton class.
-
-
-This class can be used as the C{__metaclass__} class field to ensure only a
-single instance of the class gets used in the run of an application or
-script.
-
->>> class A(object):
-...     __metaclass__ = Singleton
-
+Setup for the SCOOP functionality of mympirun
 """
 
+from shared_setup import sdw
+from shared_setup import action_target
+from setup_mympirun import mympirun_vsc_install_scripts
 
-class Singleton(type):
-    """Serves as  metaclass for classes that should implement the Singleton pattern.
 
-    See http://stackoverflow.com/questions/6760685/creating-a-singleton-in-python
-    """
-    _instances = {}
 
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+PACKAGE = {
+    'name': 'vsc-mympirun-scoop',
+    'install_requires': ['vsc-mympirun >= 3.0.5',
+                         'scoop >= 0.5.4'
+                         ],
+    'version': '3.0.5',
+    'author': [sdw],
+    'maintainer': [sdw],
+    'packages': ['vsc.mympirun.scoop', 'vsc.mympirun.scoop.worker'],
+    'namespace_packages': ['vsc', 'vsc.mympirun'],
+    'py_modules': ['vsc.__init__', 'vsc.mympirun.__init__'],
+    # 'scripts':['bin/mympirun.py'], ## is installed with vsc-mympirun, including myscoop
+    'cmdclass': {
+        "install_scripts": mympirun_vsc_install_scripts,  # this is required for easy_install for the egg_install_scripts
+    },
+
+}
+
+if __name__ == '__main__':
+    action_target(PACKAGE, extra_sdist=['setup_mympirun.py'])

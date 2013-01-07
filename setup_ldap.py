@@ -1,6 +1,8 @@
 #!/usr/bin/env python
-##
-# Copyright 2012 Ghent University
+# -*- coding: latin-1 -*-
+# #
+# Copyright 2009-2012 Ghent University
+# Copyright 2009-2012 Stijn De Weirdt
 # Copyright 2012 Andy Georges
 #
 # This file is part of VSC-tools,
@@ -23,29 +25,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
-##
+# #
 """
-Module offering the Singleton class.
-
-
-This class can be used as the C{__metaclass__} class field to ensure only a
-single instance of the class gets used in the run of an application or
-script.
-
->>> class A(object):
-...     __metaclass__ = Singleton
-
+Setup for the VSC-tools ldap utilities
 """
 
+from shared_setup import ag, sdw, wdp
+from shared_setup import action_target
 
-class Singleton(type):
-    """Serves as  metaclass for classes that should implement the Singleton pattern.
+PACKAGE = {
+    'name': 'vsc-ldap',
+    'install_requires': ['vsc-base >= 0.90'],
+    'version': '0.92',
+    'author': [ag, sdw, wdp],
+    'maintainer': [ag],
+    'packages': ['vsc.ldap'],
+    'namespace_packages': ['vsc'],
+    'scripts': [],
+    'provides': ['python-vsc-packages-ldap = 0.3'],
+}
 
-    See http://stackoverflow.com/questions/6760685/creating-a-singleton-in-python
-    """
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+if __name__ == '__main__':
+    action_target(PACKAGE)
