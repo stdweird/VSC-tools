@@ -76,6 +76,7 @@ class VSCAffinityBasic(VSCAffinity):
             self.cpusett.cpus[abs_idx] = 1 if rel_idx in rel_cpus else 0
 
 if __name__ == '__main__':
+    """Simple test code. Difficult to write unit tests because of direct dependency on hardware"""
     import time
     vp = VSCPriority()
     print vp.get_priority()
