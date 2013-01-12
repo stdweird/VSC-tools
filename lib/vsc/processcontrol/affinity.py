@@ -26,109 +26,85 @@
 """
 A module to abstract cpu affinity interfaces
 """
-from .processcontrol import InitLog, ProcessControlBase
+from .processcontrol import ProcessControlBase, what_classes
+from .cpusett import CpuSetT
 
-import ctypes
+def what_affinity(name=None):
+    """What affinity classes are there?"""
+    found_affinities = what_classes(Affinity)
 
-CPU_MASK_T_TYPE = ctypes.c_ulong
+    # case insensitive match?
+    if name is not None:
+        found_affinities = [x for x in found_affinities if x.is_affinity(name)]
 
-class CpuSetT(InitLog):
-    """Class for the cpu bits from cpu_set_t struct
-        based on vsc.utils.affinity cpu_set_t
-    """
-    CPUSETSIZE = ctypes.util.os.sysconf('SC_NPROCESSORS_CONF')
-    NCPUBITS = 8 * ctypes.sizeof(CPU_MASK_T_TYPE)
-    NBITMASK = CPUSETSIZE / NCPUBITS
+    return found_affinities
+
+
+class Affinity(ProcessControlBase):
+    """An abstract class for controlling cpu affinity of a process"""
+    AFFINITY_MODE = None
+    AFFINITY_ALGORITHM = None
+    CPUSETT_CLASS = CpuSetT
+
     def __init__(self, *args, **kwargs):
+        super(Affinity, self).__init__(*args, **kwargs)
+
+        self.cpusett = self.CPUSETT_CLASS()
+
+    @classmethod
+    def is_affinity(self, cls, name):
+        return name.lower() == cls.AFFINITY_MODE.lower()
+
+    @classmethod
+    def is_algorithm(self, cls, name):
+        return name.lower() == cls.AFFINITY_ALGORITHM.lower()
+
+    def _get_affinity(self):
+        """Actually get the affinity of self.pid and save in self.cpusett
         """
-            - cpusetsize : maximum size of cpu_set_t (ie number of cores)
-            - ncpubits : number of bits to represent cpu
-            - nbitmask : number of cpubits in __bits
+        self.log.error("_get_affinity not implemented")
+
+    def _set_affinity(self):
+        """Actually set the affinity for self.pid from self.cpusett
+            TO BE IMPLEMENTED
         """
-        self.cpusetsize = kwargs.pop('cpusetsize', self.CPUSETSIZE)
-        self.ncpubits = kwargs.pop('ncpubits', self.NCPUBITS)
-        self.nbitmask = kwargs.pop('nbitmask', self.NBITMASK)
-        super(CpuSetT, self).__init__(*args, **kwargs)
+        self.log.error("_set_affinity not implemented")
 
-        self.bits = [None] * self.nbitmask
-        self.cpus = [None] * self.cpusetsize
+    def _sanitize_cpuset(self, cpuset=None):
+        """Check if cpuset is proper type"""
+        if cpuset is None:
+            cpuset = self.cpusett
 
-    def __str__(self):
-        return self.convert_bits_hr()
+        if not isinstance(cpuset, self.CPUSETT_CLASS):
+            self.log.error("_sanitize_cpuset: cpuset type %s, expected %s" % (type(cpuset), self.CPUSETT_CLASS.__name__))
 
-    def convert_hr_bits(self, txt):
-        """Convert human readable text into __bits
-            eg 0-3,8,10-11 -> cpus = [0,1,1,1,0,0,0,1,0,1,1,0,..,0] -> __bits = [1678]
+        # TODO actual sanity check
+
+        self.cpusett = cpuset
+
+    def get_affinity(self):
+        """Get the affinity of self.pid
+            @return : CpuSetT instance
         """
-        for cpu_range in txt.split(','):
-            # always at least 2 elements: twice the same or start,end,start,end
-            indices = [int(x) for x in cpu_range.split('-')] * 2
+        self._get_affinity()
+        return self.cpusett
 
-            # sanity check
-            if indices[1] < indices[0]:
-                self.log.error("convert_hr_bits: end is lower then start in '%s'" % cpu_range)
-            elif indices[0] < 0:
-                self.log.error("convert_hr_bits: negative start in '%s'" % cpu_range)
-            elif indices[1] > self.cpusetsize + 1 :  # also covers start, since end > start
-                self.log.error("convert_hr_bits: end larger then max %s in '%s'" % (self.cpusetsize, cpu_range))
-            else:
-                self.cpus[indices[0]:indices[1] + 1] = [1] * (indices[1] + 1 - indices[0])
-
-        self.set_bits()
-        self.log.debug("convert_hr_bits: converted %s into cpus %s (bits %s)" % (txt, self.cpus, self.bits))
-
-
-    def convert_bits_hr(self):
-        """Convert bits into human readable text"""
-        if self.cpus is None:
-            self.get_cpus()
-        cpus_index = [idx for idx, cpu in enumerate(self.cpus) if cpu == 1]
-        prev = -2  # not adjacent to 0 !
-        parsed_idx = []
-        for idx in cpus_index:
-            if prev + 1 < idx:
-                parsed_idx.append("%s" % idx)
-            else:
-                first_idx = parsed_idx[-1].split("-")[0]
-                parsed_idx[-1] = "%s-%s" % (first_idx, idx)
-            prev = idx
-        return ",".join(parsed_idx)
-
-    def get_cpus(self, bits=None):
-        """Convert bits in list len == CPU_SETSIZE
-            Use 1 / 0 per cpu
+    def set_affinity(self, cpuset):
+        """Set the affinity for self.pid
+            - cpuset : instance of CpuSetT
         """
-        if bits is None:
-            bits = self.bits
-        cpuidx = 0
-        for bitmask in bits:
-            for idx in xrange(self.ncpubits):
-                self.cpus[cpuidx] = bitmask & 1
-                bitmask >>= 1
-                cpuidx += 1
-        return self.cpus
+        self._sanitize_cpuset(cpuset)
+        self._set_affinity()
 
-    def set_bits(self, bits=None):
-        """Given self.cpus, set the bits"""
-        if bits is None:
-            bits = self.bits
-        prev_cpus = self.cpus[:]
-        for idx in xrange(self.nbitmask):
-            cur_cpus = self.cpus[idx * self.ncpubits:(idx + 1) * self.ncpubits]
-            cpus = [2 ** cpuidx for cpuidx, val in enumerate(cur_cpus) if val == 1]
-            bits[idx] = sum(cpus)
-        # sanity check
-        if prev_cpus == self.get_cpus():
-            self.log.debug("set_bits: new set to %s" % self.convert_bits_hr())
-        else:
-            # get_cpus() rescans
-            max_shown = 20
-            self.log.error("set_bits: something went wrong: previous cpus %s; current ones %s (first %d shown)" %
-                           (prev_cpus[:max_shown], self.cpus[:max_shown], max_shown))
+    def _algorithm(self, *args, **kwargs):
+        """Given set of arguments, set cpusett with new process placement
+            TO BE IMPLEMENTED
+        """
+        self.log.error("_algorithm not implemented")
 
-    def str_cpus(self):
-        """Return a string representation of the cpus"""
-        if self.cpus is None:
-            self.get_cpus()
-        return "".join(["%d" % x for x in self.cpus])
-
+    def algorithm(self, *args, **kwargs):
+        """Given set of arguments, set cpusett with new process placement
+            TO BE IMPLEMENTED
+        """
+        self._algorithm(*args, **kwargs)
+        self.set_affinity(self.cpusett)

@@ -33,11 +33,31 @@ try:
 except:
     from logging import getLogger
 
+def get_subclasses(klass):
+    """
+    Get all subclasses recursively
+    """
+    res = []
+    for cl in klass.__subclasses__():
+        res.extend(get_subclasses(cl))
+        res.append(cl)
+    return res
+
+def what_classes(klass, allow_not_valid=False):
+    """What subclasses of klass are there?
+        - allow_not_valid : filter for VALID
+    """
+    found_klasses = [x for x in get_subclasses(klass) if (x.getattr('VALID', None) or allow_not_valid)]
+
+    return found_klasses
+
+
 class DummyFunction(object):
     def __getattr__(self, name):
         def dummy(*args, **kwargs):
             pass
         return dummy
+
 
 class InitLog(object):
     """Base class to set logger
@@ -58,6 +78,7 @@ class ProcessControlBase(InitLog):
     """Base class for all process control classes
         - set pid attribute
     """
+    VALID = False  # is this a valid class ?
     def __init__(self, *args, **kwargs):
         """
             - disable_log : boolean use dummy logger
