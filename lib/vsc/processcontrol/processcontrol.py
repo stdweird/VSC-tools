@@ -47,7 +47,7 @@ def what_classes(klass, allow_not_valid=False):
     """What subclasses of klass are there?
         - allow_not_valid : filter for VALID
     """
-    found_klasses = [x for x in get_subclasses(klass) if (x.getattr('VALID', None) or allow_not_valid)]
+    found_klasses = [x for x in get_subclasses(klass) if x.VALID or allow_not_valid]
 
     return found_klasses
 

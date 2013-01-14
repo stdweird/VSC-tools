@@ -49,7 +49,7 @@ class VSCPriority(Priority):
 
 class VSCAffinity(Affinity):
     AFFINITY_MODE = MODE_NAME
-    VALID = valid
+    VALID = False  # abstract, don't use
     def _get_affinity(self):
         ctypes_cpuset_t = sched_getaffinity(pid=self.pid)
         self.cpusett.set_bits(cpus=ctypes_cpuset_t.cpus)
@@ -61,8 +61,12 @@ class VSCAffinity(Affinity):
 
 class VSCAffinityBasic(VSCAffinity):
     AFFINITY_ALGORITHM = 'basiccore'
+    VALID = valid
 
-    def _algorithm(self, proc_nr, total_proc):
+    def _algorithm(self, total_proc, proc_nr):
+        proc_nr = int(proc_nr)
+        total_proc = int(total_proc)
+
         self.get_affinity()
         allowed_cpus = self.cpusett.get_cpus_idx()  # takes into account cgroups/cpusets
         total_cpus = len(allowed_cpus)

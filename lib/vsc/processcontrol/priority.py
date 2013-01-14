@@ -30,13 +30,13 @@ A module to abstract scheduler priority
 from .processcontrol import ProcessControlBase, what_classes
 
 
-def what_priority(name=None):
+def what_priority(mode=None):
     """What priority classes are there?"""
     found_priorities = what_classes(Priority)
 
     # case insensitive match?
-    if name is not None:
-        found_priorities = [x for x in found_priorities if x.is_priority_name(name)]
+    if mode is not None:
+        found_priorities = [x for x in found_priorities if x.is_priority_mode(mode)]
 
     return found_priorities
 
@@ -54,8 +54,8 @@ class Priority(ProcessControlBase):
         self.priority = self.PRIO_DEFAULT
 
     @classmethod
-    def is_priority_name(self, cls, name):
-        return name.lower() == cls.PRIORITY_MODE.lower()
+    def is_priority_mode(cls, mode):
+        return mode.lower() == cls.PRIORITY_MODE.lower() if cls.PRIORITY_MODE is not None else None
 
     def _sanitize_range(self, prio):
         """Check if prio is in valid range

@@ -64,6 +64,7 @@ class BasicCore(Algorithm):
         Division algorithm is from
         http://stackoverflow.com/questions/8084010/algorithm-for-subdividing-an-array-into-semi-equal-uniform-sub-arrays
         """
+
         def make_div(N, M):
             """
             Number of processes (total N) to place on M cpus

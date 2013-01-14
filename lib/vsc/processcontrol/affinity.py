@@ -29,13 +29,16 @@ A module to abstract cpu affinity interfaces
 from .processcontrol import ProcessControlBase, what_classes
 from .cpusett import CpuSetT
 
-def what_affinity(name=None):
+def what_affinity(mode=None, algo=None):
     """What affinity classes are there?"""
     found_affinities = what_classes(Affinity)
 
     # case insensitive match?
-    if name is not None:
-        found_affinities = [x for x in found_affinities if x.is_affinity(name)]
+    if mode is not None:
+        found_affinities = [x for x in found_affinities if x.is_affinity_mode(mode)]
+    if algo is not None:
+        found_affinities = [x for x in found_affinities if x.is_algorithm(algo)]
+
 
     return found_affinities
 
@@ -52,12 +55,12 @@ class Affinity(ProcessControlBase):
         self.cpusett = self.CPUSETT_CLASS()
 
     @classmethod
-    def is_affinity(self, cls, name):
-        return name.lower() == cls.AFFINITY_MODE.lower()
+    def is_affinity_mode(cls, mode):
+        return mode.lower() == cls.AFFINITY_MODE.lower() if cls.AFFINITY_MODE is not None else None
 
     @classmethod
-    def is_algorithm(self, cls, name):
-        return name.lower() == cls.AFFINITY_ALGORITHM.lower()
+    def is_algorithm(cls, name):
+        return name.lower() == cls.AFFINITY_ALGORITHM.lower() if cls.AFFINITY_ALGORITHM is not None else None
 
     def _get_affinity(self):
         """Actually get the affinity of self.pid and save in self.cpusett
