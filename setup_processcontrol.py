@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-# #
+#
 # Copyright 2013-2013 Ghent University
 # Copyright 2013-2013 Stijn De Weirdt
 #
@@ -24,7 +24,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
-# #
+#
 """
 Setup for the VSC-tools ldap utilities
 """
