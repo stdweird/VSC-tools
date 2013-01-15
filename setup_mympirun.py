@@ -133,7 +133,7 @@ class mympirun_vsc_install_scripts(vsc_install_scripts):
 PACKAGE = {
     'name': 'vsc-mympirun',
     'install_requires': ['vsc-base >= 0.95'],
-    'version': '3.0.5',
+    'version': '3.0.6',
     'author': [sdw],
     'maintainer': [sdw],
     'packages': ['vsc.mympirun', 'vsc.mympirun.mpi', 'vsc.mympirun.rm'],
