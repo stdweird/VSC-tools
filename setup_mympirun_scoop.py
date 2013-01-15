@@ -38,10 +38,11 @@ from setup_mympirun import mympirun_vsc_install_scripts
 
 PACKAGE = {
     'name': 'vsc-mympirun-scoop',
-    'install_requires': ['vsc-mympirun >= 3.0.5',
+    'install_requires': ['vsc-processcontrol >= 0.90',
+                         'vsc-mympirun >= 3.0.5',
                          'scoop >= 0.5.4'
                          ],
-    'version': '3.0.5',
+    'version': '3.0.9',
     'author': [sdw],
     'maintainer': [sdw],
     'packages': ['vsc.mympirun.scoop', 'vsc.mympirun.scoop.worker'],
