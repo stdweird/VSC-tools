@@ -40,7 +40,8 @@ PACKAGE = {
     'name': 'vsc-mympirun-scoop',
     'install_requires': ['vsc-processcontrol >= 0.90',
                          'vsc-mympirun >= 3.0.6',
-                         'scoop >= 0.6.0'
+                         'vsc-base >= 0.96',
+                         'scoop >= 0.6.0',
                          ],
     'version': '3.0.9',
     'author': [sdw],
