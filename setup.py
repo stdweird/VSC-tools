@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-# #
+#
 # Copyright 2009-2012 Ghent University
 # Copyright 2009-2012 Stijn De Weirdt
 # Copyright 2012 Andy Georges
@@ -25,7 +25,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
-# #
+#
 """
 VSC-tools base distribution setup.py
 """
@@ -34,7 +34,7 @@ from shared_setup import action_target
 
 PACKAGE = {
     'name': 'vsc-base',
-    'version': '0.95',
+    'version': '0.96',
     'author': [sdw, jt, ag],
     'maintainer': [sdw, jt, ag],
     'packages': ['vsc', 'vsc.utils'],

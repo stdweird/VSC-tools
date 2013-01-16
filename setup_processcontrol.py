@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
 #
-# Copyright 2009-2012 Ghent University
-# Copyright 2009-2012 Stijn De Weirdt
-# Copyright 2012 Andy Georges
+# Copyright 2013-2013 Ghent University
+# Copyright 2013-2013 Stijn De Weirdt
 #
 # This file is part of VSC-tools,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -30,19 +29,19 @@
 Setup for the VSC-tools ldap utilities
 """
 
-from shared_setup import ag, sdw, wdp
+from shared_setup import  sdw
 from shared_setup import action_target
 
 PACKAGE = {
-    'name': 'vsc-ldap',
-    'install_requires': ['vsc-base >= 0.90'],
-    'version': '0.92',
-    'author': [ag, sdw, wdp],
-    'maintainer': [ag],
-    'packages': ['vsc.ldap'],
+    'name': 'vsc-processcontrol',
+    'install_requires': ['vsc-base >= 0.95'],
+    'version': '0.90',
+    'author': [sdw],
+    'maintainer': [sdw],
+    'packages': ['vsc.processcontrol'],
+    'py_modules': ['vsc.__init__'],
     'namespace_packages': ['vsc'],
     'scripts': [],
-    'provides': ['python-vsc-packages-ldap = 0.3'],
 }
 
 if __name__ == '__main__':

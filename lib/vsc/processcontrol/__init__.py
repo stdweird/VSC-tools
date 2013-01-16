@@ -1,9 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: latin-1 -*-
 #
-# Copyright 2009-2012 Ghent University
-# Copyright 2009-2012 Stijn De Weirdt
-# Copyright 2012 Andy Georges
+# Copyright 2013-2013 Ghent University
+# Copyright 2013-2013 Stijn De Weirdt
 #
 # This file is part of VSC-tools,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -26,24 +23,7 @@
 # You should have received a copy of the GNU General Public License
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 #
-"""
-Setup for the VSC-tools ldap utilities
-"""
+import pkg_resources
+pkg_resources.declare_namespace(__name__)
 
-from shared_setup import ag, sdw, wdp
-from shared_setup import action_target
-
-PACKAGE = {
-    'name': 'vsc-ldap',
-    'install_requires': ['vsc-base >= 0.90'],
-    'version': '0.92',
-    'author': [ag, sdw, wdp],
-    'maintainer': [ag],
-    'packages': ['vsc.ldap'],
-    'namespace_packages': ['vsc'],
-    'scripts': [],
-    'provides': ['python-vsc-packages-ldap = 0.3'],
-}
-
-if __name__ == '__main__':
-    action_target(PACKAGE)
+import vsc_affinity

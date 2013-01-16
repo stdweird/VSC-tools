@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-# #
+#
 # Copyright 2009-2012 Ghent University
 # Copyright 2009-2012 Stijn De Weirdt
 # Copyright 2012 Andy Georges
@@ -25,7 +25,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
-# #
+#
 """
 Setup for mympirun
 """
@@ -36,7 +36,7 @@ import sys
 from shared_setup import vsc_install_scripts, action_target, sdw
 
 
-# # generate these somehow from lib/vsc/mympirun/mpi/mpi.py
+# generate these somehow from lib/vsc/mympirun/mpi/mpi.py
 FAKE_SUBDIRECTORY_NAME = 'fake'
 MYMPIRUN_ALIASES = ['%smpirun' % x for x in ['i', 'ih', 'o', 'm', 'mh', 'mm', 'q', 'm2', 'm2h']] + ['myscoop']
 
@@ -46,7 +46,7 @@ log = shared_setup.log
 try:
     from setuptools.command.easy_install import easy_install
 
-    # # uch uch, easy_install ignores the easy_install cmdclass
+    # uch uch, easy_install ignores the easy_install cmdclass
     _orig_install_egg_scripts = sys.modules['setuptools.command.easy_install'].easy_install.install_egg_scripts
 
     def _new_install_egg_scripts(self, dist):
@@ -133,7 +133,7 @@ class mympirun_vsc_install_scripts(vsc_install_scripts):
 PACKAGE = {
     'name': 'vsc-mympirun',
     'install_requires': ['vsc-base >= 0.95'],
-    'version': '3.0.5',
+    'version': '3.0.7',
     'author': [sdw],
     'maintainer': [sdw],
     'packages': ['vsc.mympirun', 'vsc.mympirun.mpi', 'vsc.mympirun.rm'],

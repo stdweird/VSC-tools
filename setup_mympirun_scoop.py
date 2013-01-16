@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: latin-1 -*-
-# #
+#
 # Copyright 2009-2012 Ghent University
 # Copyright 2009-2012 Stijn De Weirdt
 # Copyright 2012 Andy Georges
@@ -25,7 +25,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
-# #
+#
 """
 Setup for the SCOOP functionality of mympirun
 """
@@ -38,10 +38,12 @@ from setup_mympirun import mympirun_vsc_install_scripts
 
 PACKAGE = {
     'name': 'vsc-mympirun-scoop',
-    'install_requires': ['vsc-mympirun >= 3.0.5',
-                         'scoop >= 0.5.4'
+    'install_requires': ['vsc-processcontrol >= 0.90',
+                         'vsc-mympirun >= 3.0.7',
+                         'vsc-base >= 0.96',
+                         'scoop >= 0.5.3',
                          ],
-    'version': '3.0.5',
+    'version': '3.0.10',
     'author': [sdw],
     'maintainer': [sdw],
     'packages': ['vsc.mympirun.scoop', 'vsc.mympirun.scoop.worker'],
