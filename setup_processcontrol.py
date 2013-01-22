@@ -1,6 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: latin-1 -*-
 #
-# Copyright 2012 Ghent University
-# Copyright 2012 Stijn De Weirdt
+# Copyright 2013-2013 Ghent University
+# Copyright 2013-2013 Stijn De Weirdt
 #
 # This file is part of VSC-tools,
 # originally created by the HPC team of Ghent University (http://ugent.be/hpc/en),
@@ -23,4 +25,24 @@
 # You should have received a copy of the GNU General Public License
 # along with VSC-tools. If not, see <http://www.gnu.org/licenses/>.
 #
+"""
+Setup for the VSC-tools ldap utilities
+"""
 
+from shared_setup import  sdw
+from shared_setup import action_target
+
+PACKAGE = {
+    'name': 'vsc-processcontrol',
+    'install_requires': ['vsc-base >= 0.95'],
+    'version': '0.90',
+    'author': [sdw],
+    'maintainer': [sdw],
+    'packages': ['vsc.processcontrol'],
+    'py_modules': ['vsc.__init__'],
+    'namespace_packages': ['vsc'],
+    'scripts': [],
+}
+
+if __name__ == '__main__':
+    action_target(PACKAGE)
